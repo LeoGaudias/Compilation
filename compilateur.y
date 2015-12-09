@@ -5,7 +5,7 @@
   #include "Lib/symbol.h"
   #include "Lib/quad.h"
   
-
+  extern FILE *yyin;
   int yylex();
   int yyerror(char *);
 
@@ -79,36 +79,37 @@ axiom : list { printf("return le code mips"); $$.code = $1.code;}
 
 /* se souvenir qu'on doit pouvoir faire matrix A[2]={3,4}, IA[2]={3,4} */
 affect : 
-  TYPE ID '=' NUMBER {
-                        struct symbol * affect = symbol_add(&tds, $2);
-                        affect->type = strdup($1);
-                        affect->value = $4;
-                        affect->isconstant = false;
+  // TYPE ID '=' NUMBER {
+  //                       struct symbol * affect = symbol_add(&tds, $2);
+  //                       affect->type = strdup($1);
+  //                       affect->value = $4;
+  //                       affect->isconstant = false;
                         
-                        struct symbol * temp = symbol_alloc();
-                        temp->value = $4;
-                        temp->isconstant = true;
-                        temp->type = strdup($1);
+  //                       struct symbol * temp = symbol_alloc();
+  //                       temp->value = $4;
+  //                       temp->isconstant = true;
+  //                       temp->type = strdup($1);
                         
-                        $$.code = quad_gen(NULL, "=", temp, NULL, affect);
-                        $$.result = affect;
-                     }
-  | TYPE ID '=' '-' NUMBER {
-                              struct symbol * affect = symbol_add(&tds, $2);
-                              affect->type = strdup($1);
-                              affect->isconstant = false;
+  //                       $$.code = quad_gen(NULL, "=", temp, NULL, affect);
+  //                       $$.result = affect;
+  //                   }
+  // | TYPE ID '=' '-' NUMBER {
+  //                             struct symbol * affect = symbol_add(&tds, $2);
+  //                             affect->type = strdup($1);
+  //                             affect->isconstant = false;
                               
-                              struct symbol * temp = symbol_alloc();
-                              temp->value = -$5;
-                              temp->isconstant = true;
-                              temp->type = strdup($1);
+  //                             struct symbol * temp = symbol_alloc();
+  //                             temp->value = -$5;
+  //                             temp->isconstant = true;
+  //                             temp->type = strdup($1);
                               
-                              affect->value = temp->value;
+  //                             affect->value = temp->value;
                               
-                              $$.code = quad_gen(NULL, "=", temp, NULL, affect);
-                              $$.result = affect;
-                            }
-  | TYPE ID '=' expr {
+  //                             $$.code = quad_gen(NULL, "=", temp, NULL, affect);
+  //                             $$.result = affect;
+  //                           }
+  // |
+   TYPE ID '=' expr {
                         struct symbol * affect = symbol_add(&tds, $2);
                         affect->type = strdup($1);
                         affect->value = $4.result->value;
@@ -241,8 +242,10 @@ tagoto :  {
           }
   ;
 
-list : "int" "main" '(' ')' '{' list '}' {/* temporaire pour qu'il passe la lecture du main, les fonctions ça sera pour plus tard*/}
-  | list ';' tag statement {
+list : 
+ "int" "main" '(' ')' '{' list '}' {/* temporaire pour qu'il passe la lecture du main, les fonctions ça sera pour plus tard*/}
+|
+  list ';' tag statement {
                               complete($1.nextlist,$3);
                               $$.nextlist = $4.nextlist;
                               $$.code = concatQuad($1.code, $4.code); 
@@ -341,15 +344,14 @@ condition :
                                       $$.truelist =  $1.truelist;
                                       $$.falselist = $1.falselist;
                                     }
-  | ID                              {
-                                      $$.code = quad_gen(&nextquad,NULL,NULL,NULL,symbol_lookup(tds,$1));
-                                      nextquad++;
-                                      $$.truelist = newlist(quad_gen(&nextquad,NULL,NULL,NULL,symbol_lookup(tds,$1)));
-                                      nextquad++;
-                                      $$.falselist = newlist(quad_gen(&nextquad,NULL,NULL,NULL,symbol_lookup(tds,$1)));
-                                      nextquad++;
-                                    }
-  // | ID RELOP ID                     {}
+  // | ID                              {
+  //                                     $$.code = quad_gen(&nextquad,NULL,NULL,NULL,symbol_lookup(tds,$1));
+  //                                     nextquad++;
+  //                                     $$.truelist = newlist(quad_gen(&nextquad,NULL,NULL,NULL,symbol_lookup(tds,$1)));
+  //                                     nextquad++;
+  //                                     $$.falselist = newlist(quad_gen(&nextquad,NULL,NULL,NULL,symbol_lookup(tds,$1)));
+  //                                     nextquad++;
+  //                                   }
   ;
   
 relop :
@@ -403,7 +405,13 @@ relop :
                       $$.truelist=newlist(goto_true);
                       $$.falselist=newlist(goto_false);
                    }
-  ;
+  // | expr {
+  //           struct quad* goto_true = quad_gen(&nextquad,"goto",NULL,NULL,NULL);
+  //           quad_add(&$$.code, goto_true);
+  //           $$.truelist = newlist(goto_true);
+  //           $$.falselist = NULL;
+  //       }
+  // ;
   
 /*
 list_id : {/* empty }
@@ -431,16 +439,29 @@ id_matrix : '['INT']' {}
   ;*/
 %%
 
-int main( int argc, char **argv ){
-  ++argv;
-  --argc;  /* skip over program name */
-  if ( argc > 0 )
-  {
-    yyin = fopen( argv[0], "r" );
+// int main( int argc, char **argv ){
+//   ++argv;
+//   --argc;  /* skip over program name */
+//   if ( argc > 0 )
+//   {
+//     yyin = fopen( argv[0], "r" );
+//   }
+//   else
+//   {
+//     yyin = stdin;
+//   }
+//   yylex();
+// }
+
+int main(int argc, char *argv[]) {
+  if (argc > 1) {
+      yyin = fopen(argv[1], "r");
   }
-  else
-  {
-    yyin = stdin;
+  yyparse();
+  if (argc > 1) {
+      fclose(yyin);
   }
-  yylex();
+  // symbol_print(tds);
+  // symbol_free(tds);
+  return 0;
 }
