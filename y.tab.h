@@ -47,47 +47,51 @@ extern int yydebug;
   {
     PLUSPLUS = 258,
     MOINSMOINS = 259,
-    NUMBER = 260,
-    ID = 261,
-    NOT = 262,
-    OR = 263,
-    AND = 264,
-    IF = 265,
-    ELSE = 266,
-    WHILE = 267,
-    FOR = 268,
-    STRING = 269,
-    TYPE = 270,
-    DIFF = 271,
-    SUPEQ = 272,
-    INFEQ = 273,
-    EQUAL = 274,
-    SUP = 275,
-    INF = 276,
-    UMOINS = 281
+    MAIN = 260,
+    INT = 261,
+    FLOAT = 262,
+    ID = 263,
+    NOT = 264,
+    OR = 265,
+    AND = 266,
+    IF = 267,
+    ELSE = 268,
+    WHILE = 269,
+    FOR = 270,
+    STRING = 271,
+    TYPE = 272,
+    DIFF = 273,
+    SUPEQ = 274,
+    INFEQ = 275,
+    EQUAL = 276,
+    SUP = 277,
+    INF = 278,
+    UMOINS = 283
   };
 #endif
 /* Tokens.  */
 #define PLUSPLUS 258
 #define MOINSMOINS 259
-#define NUMBER 260
-#define ID 261
-#define NOT 262
-#define OR 263
-#define AND 264
-#define IF 265
-#define ELSE 266
-#define WHILE 267
-#define FOR 268
-#define STRING 269
-#define TYPE 270
-#define DIFF 271
-#define SUPEQ 272
-#define INFEQ 273
-#define EQUAL 274
-#define SUP 275
-#define INF 276
-#define UMOINS 281
+#define MAIN 260
+#define INT 261
+#define FLOAT 262
+#define ID 263
+#define NOT 264
+#define OR 265
+#define AND 266
+#define IF 267
+#define ELSE 268
+#define WHILE 269
+#define FOR 270
+#define STRING 271
+#define TYPE 272
+#define DIFF 273
+#define SUPEQ 274
+#define INFEQ 275
+#define EQUAL 276
+#define SUP 277
+#define INF 278
+#define UMOINS 283
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -99,6 +103,11 @@ union YYSTYPE
   float value;
   char* string;
   struct symbol* label;
+  
+  struct {
+    char* type;
+    float value;
+  } num;
     
   struct {
       struct symbol *result;
@@ -123,7 +132,7 @@ union YYSTYPE
     struct quad_list* nextlist;
   } code_goto;
 
-#line 127 "y.tab.h" /* yacc.c:1909  */
+#line 136 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

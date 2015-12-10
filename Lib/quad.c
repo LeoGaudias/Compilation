@@ -76,24 +76,49 @@ struct quad_list* newlist(struct quad *q)
 
 struct quad_list* concatList(struct quad_list* l1, struct quad_list* l2)
 {
-  struct quad * temp = l1->first_quad;
-  while(temp != NULL){
-    temp = temp->nextquad;
-  }
-  if(l2!=NULL)
+  if(l1 != NULL)
   {
-    temp->nextquad = l2->first_quad;
+    struct quad * temp = l1->first_quad;
+    while(temp != NULL)
+    {
+      temp = temp->nextquad;
+    }
+    if(l2!=NULL)
+    {
+      temp = l2->first_quad;
+    }
+    return l1;
   }
-  return l1;
+  else if(l2 != NULL)
+  {
+    return l2;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 void complete(struct quad_list* l, struct symbol* tag)
 {
   // complète les quads de la liste l avec le label tag (tag est un symbole qui contient le label)
-  struct quad* temp=l->first_quad;
-  while(temp->nextquad!=NULL)
+  if(l!=NULL)
   {
-    temp=temp->nextquad;
+    struct quad* temp=l->first_quad;
+    while(temp->nextquad!=NULL)
+    {
+      temp=temp->nextquad;
+    }
+    temp->res=tag;
   }
-  temp->res=tag;
+  // else rien
+}
+
+void quad_list_print(struct quad_list* list)
+{
+  while (list->first_quad != NULL)
+  {
+    quad_print(list->first_quad);
+    list->first_quad = list->first_quad->nextquad; 
+  }
 }

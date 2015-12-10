@@ -17,8 +17,8 @@ id          [a-zA-Z_]+[0-9a-zA-Z_]*
 
 %%
 
-{int}          { yylval.value = atoi(yytext); return NUMBER; }
-{float}        { yylval.value = atof(yytext); return NUMBER; }
+{int}          { yylval.value = atoi(yytext); return INT; }
+{float}        { yylval.value = atof(yytext); return FLOAT; }
 {string}       { yylval.string = strdup(yytext); return STRING; }
 "++"           { yylval.string = strdup(yytext); return PLUSPLUS; }
 "--"           { yylval.string = strdup(yytext); return MOINSMOINS; }
@@ -38,6 +38,7 @@ for            { yylval.string = strdup(yytext); return FOR; }
 "int"          { yylval.string = strdup(yytext); return TYPE;}
 "float"        { yylval.string = strdup(yytext); return TYPE;}
 "matrix"       { yylval.string = strdup(yytext); return TYPE;}
+"main"         { return MAIN; }
 {keyword}      { return yytext[0]; /*yylval.string = strdup(yytext); return KEYWORD;*/ }
 {comment}      { return yytext[0]; }
 [-,{}()+*/;~=] { return yytext[0]; }

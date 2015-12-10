@@ -19,3 +19,4 @@ struct quad* concatQuad(struct quad * q1, struct quad * q2);
 struct quad_list* newlist(struct quad *q);
 struct quad_list* concatList(struct quad_list* l1, struct quad_list* l2);
 void complete(struct quad_list* l, struct symbol* tag);
+void quad_list_print(struct quad_list* list);

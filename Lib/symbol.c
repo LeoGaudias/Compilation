@@ -30,7 +30,7 @@ struct symbol* symbol_lookup(struct symbol* tds,char* id)
     bool found=false;
     while(temp != NULL && found == false)
     {
-        if(temp->id == id)
+        if(strcmp(temp->id,id))
         {
             found = true;
             break;
@@ -71,6 +71,7 @@ struct symbol* symbol_newlabel(struct symbol** tds, int nextquad)
     *tds = symbol_alloc();
     (*tds)->id = strdup(temp_name);
     (*tds)->value = nextquad;
+    (*tds)->type="int";
     
     return *tds;
   } 
@@ -86,6 +87,7 @@ struct symbol* symbol_newlabel(struct symbol** tds, int nextquad)
     temp->isconstant=true;
     temp->id = strdup(temp_name);
     temp->value = nextquad;
+    temp->type="int";
     scan->next = temp;
     
     return scan->next;
@@ -96,8 +98,9 @@ void symbol_print(struct symbol* tds)
 {
     while (tds != NULL)
     {
-        if(tds->type=="int")
+        if(tds->type!=NULL && strcmp(tds->type,"int") == 0)
         {
+            // printf("hello ");
             printf("--> %s:%d\n", tds->id,(int) tds->value);
         }
         else
