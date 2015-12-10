@@ -85,10 +85,10 @@
   ;*/
   
 axiom : 
-// list { printf("return le code mips"); $$.code = $1.code;}
+ list { printf("Match\n"); $$.code = $1.code;}
 // expr '\n'{ printf("Match\n"); $$.code = $1.code;}
 // affect {printf("Match\n"); $$.code = $1.code;}
- statement {printf("Match\n"); $$.code = $1.code;}
+//statement {printf("Match\n"); $$.code = $1.code;}
 // condition {printf("Match\n"); $$.code = $1.code;}
   ;
 
