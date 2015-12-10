@@ -42,13 +42,16 @@ struct symbol* symbol_lookup(struct symbol* tds,char* id)
 
 struct symbol* symbol_add(struct symbol** tds, char* id)
 {
-    if (*tds == NULL) {
+    if (*tds == NULL)
+    {
         *tds = symbol_alloc();
         (*tds)->id = strdup(id);
         return *tds;
-    } else {
+    } 
+    else {
         struct symbol* scan = *tds;
-        while (scan->next != NULL) {
+        while (scan->next != NULL) 
+        {
             scan = scan->next;
         }
         scan->next = symbol_alloc();
@@ -58,17 +61,16 @@ struct symbol* symbol_add(struct symbol** tds, char* id)
     }
 }
 
-struct symbol* symbol_newcst(struct symbol** tds, int nextquad) // je pense ...
+//adresse constante --> ce n'est pas une variable constante
+struct symbol* symbol_newlabel(struct symbol** tds, int nextquad)
 {
   char temp_name[SYMBOL_MAX_NAME];
-  snprintf(temp_name, SYMBOL_MAX_NAME, "temp_%d", nb_symbol);
+  snprintf(temp_name, SYMBOL_MAX_NAME, "label_%d", nextquad);
   if (*tds == NULL)
   {
     *tds = symbol_alloc();
-    (*tds)->id = temp_name;
+    (*tds)->id = strdup(temp_name);
     (*tds)->value = nextquad;
-    
-    nb_symbol++;
     
     return *tds;
   } 
@@ -82,11 +84,9 @@ struct symbol* symbol_newcst(struct symbol** tds, int nextquad) // je pense ...
     
     struct symbol * temp = symbol_alloc();
     temp->isconstant=true;
-    temp->id = temp_name;
+    temp->id = strdup(temp_name);
     temp->value = nextquad;
     scan->next = temp;
-    
-    nb_symbol++;
     
     return scan->next;
   }
@@ -94,8 +94,16 @@ struct symbol* symbol_newcst(struct symbol** tds, int nextquad) // je pense ...
 
 void symbol_print(struct symbol* tds)
 {
-    while (tds != NULL) {
-        printf("--> %s:%f", tds->id, tds->value);
+    while (tds != NULL)
+    {
+        if(tds->type=="int")
+        {
+            printf("--> %s:%d\n", tds->id,(int) tds->value);
+        }
+        else
+        {
+            printf("--> %s:%f\n", tds->id, tds->value);
+        }
         tds = tds->next;
     }
 }

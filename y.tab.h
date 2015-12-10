@@ -45,40 +45,56 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMBER = 258,
-    ID = 259,
-    NOT = 260,
-    OR = 261,
-    AND = 262,
-    IF = 263,
-    ELSE = 264,
-    WHILE = 265,
-    FOR = 266,
-    STRING = 267,
-    TYPE = 268,
-    UMOINS = 275
+    PLUSPLUS = 258,
+    MOINSMOINS = 259,
+    NUMBER = 260,
+    ID = 261,
+    NOT = 262,
+    OR = 263,
+    AND = 264,
+    IF = 265,
+    ELSE = 266,
+    WHILE = 267,
+    FOR = 268,
+    STRING = 269,
+    TYPE = 270,
+    DIFF = 271,
+    SUPEQ = 272,
+    INFEQ = 273,
+    EQUAL = 274,
+    SUP = 275,
+    INF = 276,
+    UMOINS = 281
   };
 #endif
 /* Tokens.  */
-#define NUMBER 258
-#define ID 259
-#define NOT 260
-#define OR 261
-#define AND 262
-#define IF 263
-#define ELSE 264
-#define WHILE 265
-#define FOR 266
-#define STRING 267
-#define TYPE 268
-#define UMOINS 275
+#define PLUSPLUS 258
+#define MOINSMOINS 259
+#define NUMBER 260
+#define ID 261
+#define NOT 262
+#define OR 263
+#define AND 264
+#define IF 265
+#define ELSE 266
+#define WHILE 267
+#define FOR 268
+#define STRING 269
+#define TYPE 270
+#define DIFF 271
+#define SUPEQ 272
+#define INFEQ 273
+#define EQUAL 274
+#define SUP 275
+#define INF 276
+#define UMOINS 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 17 "compilateur.y" /* yacc.c:1909  */
+#line 18 "compilateur.y" /* yacc.c:1909  */
 
   float value;
   char* string;
@@ -107,7 +123,7 @@ union YYSTYPE
     struct quad_list* nextlist;
   } code_goto;
 
-#line 111 "y.tab.h" /* yacc.c:1909  */
+#line 127 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

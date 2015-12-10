@@ -11,7 +11,7 @@ struct symbol {
 
 struct symbol* symbol_alloc();
 struct symbol* symbol_lookup(struct symbol* tds,char* id);
-struct symbol* symbol_newcst(struct symbol** tds, int nextquad);
+struct symbol* symbol_newlabel(struct symbol** tds, int nextquad);
 struct symbol* symbol_newtemp(struct symbol** tds);
 struct symbol* symbol_add(struct symbol** tds, char* id);
 void symbol_print(struct symbol* tds);

@@ -19,22 +19,45 @@ struct quad* quad_gen(int* label, char* op, struct symbol* arg1, struct symbol* 
 
 void quad_add(struct quad** list, struct quad* new)
 {
-    if (*list == NULL) {
-        *list = new;
-    } else {
-        struct quad* scan = *list;
-        while (scan->nextquad != NULL) {
-            scan = scan->nextquad;
-        }
-        scan->nextquad = new;
+    if (*list == NULL)
+    {
+      *list = new;
+    }
+    else
+    {
+      struct quad* scan = *list;
+      while (scan->nextquad != NULL) 
+      {
+          scan = scan->nextquad;
+      }
+      scan->nextquad = new;
     }
 }
 
 void quad_print(struct quad* list)
 {
-    while (list != NULL) {
-        printf("%d %s %7s %7s %7s\n", list->label, list->op, list->arg1->id, list->arg2->id, list->res->id);
-        list = list->nextquad;
+    while (list != NULL)
+    {
+      printf("%d ",list->label);
+      
+      if(list->arg1 != NULL)
+        printf("%s ",list->arg1->id);
+      else
+        printf("NULL ");
+      
+      if(list->arg2 != NULL)
+        printf("%s ",list->arg2->id);
+      else
+        printf("NULL ");
+      
+      if(list->res != NULL)
+        printf("%s ",list->res->id);
+      else
+        printf("NULL ");
+      
+      printf("\n");
+      
+      list = list->nextquad;
     }
 }
 
@@ -57,7 +80,10 @@ struct quad_list* concatList(struct quad_list* l1, struct quad_list* l2)
   while(temp != NULL){
     temp = temp->nextquad;
   }
-  temp->nextquad = l2->first_quad;
+  if(l2!=NULL)
+  {
+    temp->nextquad = l2->first_quad;
+  }
   return l1;
 }
 
