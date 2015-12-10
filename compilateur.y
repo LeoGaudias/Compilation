@@ -93,7 +93,8 @@ axiom :
   ;
 
 /* se souvenir qu'on doit pouvoir faire matrix A[2]={3,4}, IA[2]={3,4} */
-affect1 : 
+affect1 :
+  // TYPE ID ';' {}
   TYPE ID '=' expr {
                         struct symbol * affect = symbol_add(&tds, $2);
                         affect->type = strdup($1);
@@ -250,26 +251,38 @@ tagoto :  {
 
 list : 
   TYPE MAIN '(' ')' '{' list '}' {/* temporaire pour qu'il passe la lecture du main, les fonctions ça sera pour plus tard*/}
-  |list ';' tag statement {
+  
+ /* |list ';' tag statement {
                               complete($1.nextlist,$3);
                               $$.nextlist = $4.nextlist;
                               $$.code = concatQuad($1.code, $4.code); 
                             }
-  | list affect1 ';'
+  | list ';' affect1
                     {
-                      $$.nextlist = newlist($2.code);
-                      $$.code = concatQuad($1.code, $2.code);
+                      $$.nextlist = newlist($3.code);
+                      $$.code = concatQuad($1.code, $3.code);
                     }
   | statement {
                 $$.code = $1.code;
                 $$.nextlist = NULL;
               }
-  | affect1 ';'
+  | affect1
             {
               $$.code = $1.code;
               $$.nextlist = NULL;
             }
-  | {}
+  | {/* empty }*/
+  | tag statement list {
+                              complete($3.nextlist,$1);
+                              $$.nextlist = $2.nextlist;
+                              $$.code = concatQuad($3.code, $2.code); 
+                            }
+  | affect1 ';' list
+                    {
+                      $$.nextlist = newlist($1.code);
+                      $$.code = concatQuad($3.code, $1.code);
+                    }
+  | {/* empty */}
   ;
   
 statement : 
