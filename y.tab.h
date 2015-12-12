@@ -48,57 +48,65 @@ extern int yydebug;
     PLUSPLUS = 258,
     MOINSMOINS = 259,
     MAIN = 260,
-    INT = 261,
-    FLOAT = 262,
-    ID = 263,
-    NOT = 264,
-    OR = 265,
-    AND = 266,
-    IF = 267,
-    ELSE = 268,
-    WHILE = 269,
-    FOR = 270,
-    STRING = 271,
-    TYPE = 272,
-    DIFF = 273,
-    SUPEQ = 274,
-    INFEQ = 275,
-    EQUAL = 276,
-    SUP = 277,
-    INF = 278,
-    UMOINS = 283
+    PRINT = 261,
+    PRINTF = 262,
+    PRINTMAT = 263,
+    RETURN = 264,
+    INT = 265,
+    FLOAT = 266,
+    ID = 267,
+    NOT = 268,
+    OR = 269,
+    AND = 270,
+    IF = 271,
+    ELSE = 272,
+    WHILE = 273,
+    FOR = 274,
+    STRING = 275,
+    TYPE = 276,
+    DIFF = 277,
+    SUPEQ = 278,
+    INFEQ = 279,
+    EQUAL = 280,
+    SUP = 281,
+    INF = 282,
+    UMOINS = 287
   };
 #endif
 /* Tokens.  */
 #define PLUSPLUS 258
 #define MOINSMOINS 259
 #define MAIN 260
-#define INT 261
-#define FLOAT 262
-#define ID 263
-#define NOT 264
-#define OR 265
-#define AND 266
-#define IF 267
-#define ELSE 268
-#define WHILE 269
-#define FOR 270
-#define STRING 271
-#define TYPE 272
-#define DIFF 273
-#define SUPEQ 274
-#define INFEQ 275
-#define EQUAL 276
-#define SUP 277
-#define INF 278
-#define UMOINS 283
+#define PRINT 261
+#define PRINTF 262
+#define PRINTMAT 263
+#define RETURN 264
+#define INT 265
+#define FLOAT 266
+#define ID 267
+#define NOT 268
+#define OR 269
+#define AND 270
+#define IF 271
+#define ELSE 272
+#define WHILE 273
+#define FOR 274
+#define STRING 275
+#define TYPE 276
+#define DIFF 277
+#define SUPEQ 278
+#define INFEQ 279
+#define EQUAL 280
+#define SUP 281
+#define INF 282
+#define UMOINS 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 18 "compilateur.y" /* yacc.c:1909  */
+#line 19 "compilateur.y" /* yacc.c:1909  */
 
   float value;
   char* string;
@@ -132,7 +140,7 @@ union YYSTYPE
     struct quad_list* nextlist;
   } code_goto;
 
-#line 136 "y.tab.h" /* yacc.c:1909  */
+#line 144 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

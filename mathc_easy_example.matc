@@ -1,0 +1,23 @@
+int main()
+{
+  int A=3, IA=4, B=5, X=6;
+  float det;
+  /* Calcul de la matrice inverse de A */
+  
+  /* Calcul du déterminant de A */
+  det = 1/(10);
+  IA = det*IA;
+  
+  /* Calcul de X */
+  X = IA*B;
+  
+  /* Affichage du résultat */
+  printf("La solution de l’équation AX=B, avec A = ");
+  print(A);
+  printf("et B = ");
+  print(B);
+  printf("est X= ");
+  print(X);
+  printf("\n");
+  return 0;
+}

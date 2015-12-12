@@ -94,14 +94,31 @@ struct symbol* symbol_newlabel(struct symbol** tds, int nextquad)
   }
 }
 
+void symbol_complete(struct symbol** tds,char* type)
+{
+    struct symbol* temp = *tds;
+    while (temp != NULL)
+    {
+        if(temp->type == NULL)
+        {
+            temp->type = strdup(type);
+        }
+        temp=temp->next;
+    }
+}
+
 void symbol_print(struct symbol* tds)
 {
     while (tds != NULL)
     {
         if(tds->type!=NULL && strcmp(tds->type,"int") == 0)
         {
-            // printf("hello ");
             printf("--> %s:%d\n", tds->id,(int) tds->value);
+        }
+        else if(tds->type!=NULL && strcmp(tds->type,"string") == 0)
+        {
+            // à voir si ça fonctionne come on veut
+            printf("--> %s:%s\n", tds->type, tds->id);
         }
         else
         {
@@ -109,4 +126,18 @@ void symbol_print(struct symbol* tds)
         }
         tds = tds->next;
     }
+}
+
+void symbol_free(struct symbol* tds)
+{
+    struct symbol* temp1 = tds;
+    struct symbol* temp2 = tds->next;
+    while(temp2 != NULL){
+        free(temp1->id);
+        //free(temp1->type);
+        free(temp1);
+        temp1 = temp2;
+        temp2 = temp2->next;
+    }
+    free(temp1);
 }

@@ -40,17 +40,22 @@ void quad_print(struct quad* list)
     {
       printf("%d ",list->label);
       
-      if(list->arg1 != NULL)
+      if(list->op != NULL)
+        printf("%s ",list->op);
+      else
+        printf("NULL ");
+        
+      if(list->arg1 != NULL && list->arg1->id != NULL)
         printf("%s ",list->arg1->id);
       else
         printf("NULL ");
       
-      if(list->arg2 != NULL)
+      if(list->arg2 != NULL && list->arg2->id != NULL)
         printf("%s ",list->arg2->id);
       else
         printf("NULL ");
       
-      if(list->res != NULL)
+      if(list->res != NULL && list->res->id != NULL)
         printf("%s ",list->res->id);
       else
         printf("NULL ");
@@ -65,6 +70,22 @@ struct quad* concatQuad(struct quad * q1, struct quad * q2)
 {
     q1->nextquad = q2;
     return q1;
+}
+
+void quad_free(struct quad * q)
+{
+  struct quad* temp1 = q;
+  struct quad* temp2 = q->nextquad;
+  while(temp2 != NULL){
+      //free(temp1->op);
+      // symbol_free(temp1->arg1);
+      // symbol_free(temp1->arg2);
+      // symbol_free(temp1->res);
+      free(temp1);
+      temp1 = temp2;
+      temp2 = temp2->nextquad;
+  }
+  free(temp1);
 }
 
 struct quad_list* newlist(struct quad *q)

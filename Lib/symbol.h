@@ -14,4 +14,6 @@ struct symbol* symbol_lookup(struct symbol* tds,char* id);
 struct symbol* symbol_newlabel(struct symbol** tds, int nextquad);
 struct symbol* symbol_newtemp(struct symbol** tds);
 struct symbol* symbol_add(struct symbol** tds, char* id);
+void symbol_complete(struct symbol** tds,char* type);
 void symbol_print(struct symbol* tds);
+void symbol_free(struct symbol* tds);

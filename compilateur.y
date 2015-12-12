@@ -4,13 +4,14 @@
   #include <string.h>
   #include "Lib/symbol.h"
   #include "Lib/quad.h"
+  #include "Lib/mips.h"
   
   extern FILE *yyin;
   int yylex();
   int yyerror(char *);
+  //void lex_free();
 
   struct symbol* tds = NULL;
-  struct symbol** sauv_tds = &tds;
   struct quad* code = NULL;
   int nextquad = 0;
 %}
@@ -49,8 +50,8 @@
   } code_goto;
 }
 
-%token PLUSPLUS MOINSMOINS MAIN
-%token<value> INT FLOAT //NUMBER
+%token PLUSPLUS MOINSMOINS MAIN PRINT PRINTF PRINTMAT RETURN
+%token<value> INT FLOAT 
 
 // necessaire aux conditions
 %token<string> ID NOT OR AND IF ELSE WHILE FOR STRING TYPE DIFF SUPEQ INFEQ EQUAL SUP INF //KEYWORD
@@ -58,9 +59,9 @@
 //%type <codegen> matrice row liste_elem
 
 %type<string> op
-%type <codegen> expr increment affect1 affect2
+%type <codegen> expr increment affect1 affect2 list_expr print
 
-%type<code_condition> condition //relop 
+%type<code_condition> condition
 %type<code_statement> statement list axiom
 %type<label> tag
 %type<code_goto> tagoto
@@ -77,39 +78,73 @@
 %left NOT
 
 %%
-
-/*axiom : affect ';' axiom { printf("return le code mips"); $$.code = $1.code;}
-  | '\n' {}
-  | '\n' axiom {}
-  | {empty}
-  ;*/
   
 axiom : 
- list { printf("Match\n"); $$.code = $1.code;}
-// expr '\n'{ printf("Match\n"); $$.code = $1.code;}
-// affect {printf("Match\n"); $$.code = $1.code;}
-//statement {printf("Match\n"); $$.code = $1.code;}
-// condition {printf("Match\n"); $$.code = $1.code;}
+ list { 
+        printf("Match\n");
+        $$.code = $1.code;
+        code = $1.code;
+        printf("---TDS---\n");
+        symbol_print(tds);
+        printf("---CODE---\n");
+        quad_print(code);
+        //exit(0);
+      }
   ;
 
 /* se souvenir qu'on doit pouvoir faire matrix A[2]={3,4}, IA[2]={3,4} */
 affect1 :
-  // TYPE ID ';' {}
-  TYPE ID '=' expr {
-                        struct symbol * affect = symbol_add(&tds, $2);
-                        affect->type = strdup($1);
-                        affect->value = $4.result->value;
-                        affect->isconstant = false;
-                        $$.result = affect;
-                        
-                        $$.code = quad_gen(&nextquad, "=", $4.result, NULL, affect);
-                        nextquad++;
-                      }
+  TYPE list_expr
+          {
+            $$.result = $2.result;
+            $$.result->type = strdup($1);
+            $$.code = $2.code;
+            symbol_complete(&tds,$1);
+          }
   | affect2 {
               $$.result = $1.result;
               $$.code = $1.code;
             }
 //| TYPE ID id_matrix '=' matrice
+  ;
+  
+list_expr :
+    ID '=' expr ',' list_expr
+                              {
+                                struct symbol * affect = symbol_add(&tds, $1);
+                                affect->value = $3.result->value;
+                                affect->isconstant = false;
+                                $$.result = affect;
+                                
+                                $$.code = concatQuad(quad_gen(&nextquad, "=", $3.result, NULL, affect),$5.code);
+                                nextquad++;
+                              }
+  | ID ',' list_expr {
+                      struct symbol * affect = symbol_add(&tds, $1);
+                      affect->isconstant = false;
+                      $$.result = affect;
+                      
+                      $$.code = concatQuad(quad_gen(&nextquad, "", NULL, NULL, affect),$3.code);
+                      nextquad++;
+                    }
+                    
+  | ID '=' expr {
+                  struct symbol * affect = symbol_add(&tds, $1);
+                  affect->value = $3.result->value;
+                  affect->isconstant = false;
+                  $$.result = affect;
+                  
+                  $$.code = quad_gen(&nextquad, "=", $3.result, NULL, affect);
+                  nextquad++;
+                }
+  | ID {
+          struct symbol * affect = symbol_add(&tds, $1);
+          affect->isconstant = false;
+          $$.result = affect;
+          
+          $$.code = quad_gen(&nextquad, "", NULL, NULL, affect);
+          nextquad++;
+        }
   ;
   
 affect2 :
@@ -182,8 +217,8 @@ expr :
   ;
   
 number : 
-    INT { $$.value=$1; $$.type=strdup("int");}
-  | FLOAT { $$.value=$1; $$.type=strdup("float");}
+    INT { $$.value=$1; $$.type="int";}
+  | FLOAT { $$.value=$1; $$.type="float";}
   ;
 // seg fault quand ya id non présent !
 increment : 
@@ -194,14 +229,14 @@ increment :
                       $$.code = quad_gen(&nextquad,"++", temp, NULL, $$.result);
                       nextquad++;
                     }
-  | PLUSPLUS ID         {
+  | PLUSPLUS ID     {
                       struct symbol* temp = symbol_lookup(tds,$2);
                       temp->value += 1;
                       $$.result = temp;
                       $$.code = quad_gen(&nextquad,"++", NULL, temp, $$.result);
                       nextquad++;
                     }
-  | ID MOINSMOINS         {
+  | ID MOINSMOINS   {
                       struct symbol* temp = symbol_lookup(tds,$1);
                       temp->value -= 1;
                       $$.result = temp;
@@ -250,39 +285,58 @@ tagoto :  {
   ;
 
 list : 
-  TYPE MAIN '(' ')' '{' list '}' {/* temporaire pour qu'il passe la lecture du main, les fonctions ça sera pour plus tard*/}
+  TYPE MAIN '(' ')' '{' list RETURN number ';' '}'  {
+                                                      $$.code = $6.code;
+                                                      $$.nextlist = $6.nextlist;
+                                                    }
   
- /* |list ';' tag statement {
-                              complete($1.nextlist,$3);
-                              $$.nextlist = $4.nextlist;
-                              $$.code = concatQuad($1.code, $4.code); 
-                            }
-  | list ';' affect1
-                    {
-                      $$.nextlist = newlist($3.code);
-                      $$.code = concatQuad($1.code, $3.code);
-                    }
-  | statement {
-                $$.code = $1.code;
-                $$.nextlist = NULL;
-              }
-  | affect1
-            {
-              $$.code = $1.code;
-              $$.nextlist = NULL;
-            }
-  | {/* empty }*/
   | tag statement list {
-                              complete($3.nextlist,$1);
-                              $$.nextlist = $2.nextlist;
-                              $$.code = concatQuad($3.code, $2.code); 
-                            }
+                          complete($3.nextlist,$1);
+                          $$.nextlist = $2.nextlist;
+                          $$.code = concatQuad($2.code, $3.code); 
+                        }
   | affect1 ';' list
                     {
                       $$.nextlist = newlist($1.code);
-                      $$.code = concatQuad($3.code, $1.code);
+                      $$.code = concatQuad($1.code, $3.code);
                     }
-  | {/* empty */}
+  | print ';' list {
+                      $$.nextlist = newlist($1.code);
+                      // printf("print -- $3.code --");
+                      // quad_print($3.code);
+                      // printf("endPrint -- $3.code -- \n");
+                      $$.code = concatQuad($1.code, $3.code);
+                   }
+  | {$$.code=NULL;/* empty */}
+  ;
+  
+print:
+ PRINT '(' ID ')'
+    {
+      struct symbol * affect = symbol_lookup(tds, $3);
+      $$.code = quad_gen(&nextquad,"print",affect,NULL,NULL);
+      $$.result = affect;
+      nextquad++;
+    }
+ |PRINT '(' number ')'
+    {
+      struct symbol * temp = symbol_newtemp(&tds); 
+      temp->type = $3.type;
+      temp->value = $3.value;
+      $$.code = quad_gen(&nextquad,"print",temp,NULL,NULL);
+      $$.result = temp;
+      nextquad++;
+    }
+ | PRINTF '(' STRING ')'
+   {
+      struct symbol * temp = symbol_newtemp(&tds); 
+      temp->type = "string";
+      temp->id = strdup($3);
+      $$.code = quad_gen(&nextquad,"printf",temp,NULL,NULL);
+      $$.result = temp;
+      nextquad++;
+   }
+// |PRINTMAT '('  ')'
   ;
   
 statement : 
@@ -384,12 +438,8 @@ op : SUP  { $$=$1; }
   ;
   
 /*
-list_id : {/* empty }
-  | TYPE ID, list_id{}
-  | TYPE ID {}
-  ;
   
-function : TYPE ID '(' list_id ')' '{' tag list '}'
+function : TYPE ID '(' list ')' '{' tag list '}'
   ;
 
 matrice : '{' row '}' {}
@@ -417,6 +467,9 @@ int main(int argc, char *argv[]) {
       fclose(yyin);
   }
   // symbol_print(tds);
-  // symbol_free(tds);
+  symbol_free(tds);
+  quad_free(code);
+  //generateFile(code);
+  //lex_free();
   return 0;
 }
