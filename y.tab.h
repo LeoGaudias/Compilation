@@ -106,7 +106,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 19 "compilateur.y" /* yacc.c:1909  */
+#line 22 "compilateur.y" /* yacc.c:1909  */
 
   float value;
   char* string;

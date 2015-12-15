@@ -66,11 +66,11 @@ void quad_print(struct quad* list)
     }
 }
 
-struct quad* concatQuad(struct quad * q1, struct quad * q2)
-{
-    q1->nextquad = q2;
-    return q1;
-}
+// struct quad* concatQuad(struct quad * q1, struct quad * q2)
+// {
+//     q1->nextquad = q2;
+//     return q1;
+// }
 
 void quad_free(struct quad * q)
 {

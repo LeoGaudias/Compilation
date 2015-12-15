@@ -13,6 +13,8 @@ struct symbol* symbol_alloc()
     new->isconstant = false;
     new->value = 0;
     new->next = NULL;
+    
+    return new;
 }
 
 struct symbol* symbol_newtemp(struct symbol** tds)
@@ -26,8 +28,8 @@ struct symbol* symbol_newtemp(struct symbol** tds)
 
 struct symbol* symbol_lookup(struct symbol* tds,char* id)
 {
-    struct symbol* temp=tds;
-    bool found=false;
+    struct symbol* temp = tds;
+    bool found = false;
     while(temp != NULL && found == false)
     {
         if(strcmp(temp->id,id))
@@ -111,18 +113,18 @@ void symbol_print(struct symbol* tds)
 {
     while (tds != NULL)
     {
-        if(tds->type!=NULL && strcmp(tds->type,"int") == 0)
+        if(tds->type!=NULL && strcmp(tds->type,"int") >= 0)
         {
-            printf("--> %s:%d\n", tds->id,(int) tds->value);
+            printf("--> %s : %s : %d\n", tds->id, tds->type, (int)tds->value);
         }
         else if(tds->type!=NULL && strcmp(tds->type,"string") == 0)
         {
             // à voir si ça fonctionne come on veut
-            printf("--> %s:%s\n", tds->type, tds->id);
+            printf("--> %s : %s\n", tds->type, tds->id);
         }
         else
         {
-            printf("--> %s:%f\n", tds->id, tds->value);
+            printf("--> %s : %s : %f\n", tds->id, tds->type, tds->value);
         }
         tds = tds->next;
     }
@@ -141,3 +143,16 @@ void symbol_free(struct symbol* tds)
     }
     free(temp1);
 }
+
+// void symbol_free(struct symbol* tds)
+// {
+//     struct symbol* temp = tds->next;
+//     if(temp != NULL){
+        
+//         free(tds->id);
+//         free(tds->type);
+//         free(tds->matrix);
+//         free(tds);
+//         symbol_free(temp);
+//     }
+// }

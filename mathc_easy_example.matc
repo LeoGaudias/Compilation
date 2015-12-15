@@ -5,6 +5,7 @@ int main()
   /* Calcul de la matrice inverse de A */
   
   /* Calcul du déterminant de A */
+  float der=2.3;
   det = 1/(10);
   IA = det*IA;
   

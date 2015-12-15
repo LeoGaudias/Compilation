@@ -6,6 +6,7 @@ struct symbol {
     char* type;
     float value;
     bool isconstant;
+    struct matrix_float* matrix;
     struct symbol* next;
 };
 

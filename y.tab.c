@@ -69,18 +69,21 @@
   #include <string.h>
   #include "Lib/symbol.h"
   #include "Lib/quad.h"
+  #include "Lib/matrix.h"
   #include "Lib/mips.h"
   
   extern FILE *yyin;
   int yylex();
   int yyerror(char *);
   //void lex_free();
+  void errorManagement(char * str);
 
   struct symbol* tds = NULL;
   struct quad* code = NULL;
   int nextquad = 0;
+  int nb_string = 0;
 
-#line 84 "y.tab.c" /* yacc.c:339  */
+#line 87 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -176,7 +179,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 19 "compilateur.y" /* yacc.c:355  */
+#line 22 "compilateur.y" /* yacc.c:355  */
 
   float value;
   char* string;
@@ -210,7 +213,7 @@ union YYSTYPE
     struct quad_list* nextlist;
   } code_goto;
 
-#line 214 "y.tab.c" /* yacc.c:355  */
+#line 217 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -225,7 +228,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 229 "y.tab.c" /* yacc.c:358  */
+#line 232 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -465,18 +468,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  24
+#define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   201
+#define YYLAST   252
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  46
+#define YYNTOKENS  49
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  15
+#define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  50
+#define YYNRULES  74
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  127
+#define YYNSTATES  183
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -494,15 +497,15 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      41,    42,    37,    35,    40,    36,     2,    38,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    44,
+      40,    41,    37,    35,    45,    36,     2,    38,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    43,
       30,    28,    29,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,    46,     2,    47,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    43,     2,    45,     2,     2,     2,     2,
+       2,     2,     2,    42,     2,    44,    48,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -525,12 +528,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    83,    83,    97,   104,   112,   122,   131,   140,   151,
-     159,   167,   174,   181,   188,   195,   199,   201,   205,   211,
-     220,   221,   225,   232,   239,   246,   272,   278,   288,   293,
-     298,   303,   310,   314,   321,   330,   343,   351,   360,   370,
-     382,   395,   404,   409,   414,   432,   433,   434,   435,   436,
-     437
+       0,    86,    86,    99,   112,   119,   133,   145,   158,   166,
+     173,   177,   185,   201,   217,   230,   246,   266,   287,   304,
+     324,   346,   350,   358,   370,   377,   393,   409,   425,   443,
+     447,   452,   463,   469,   479,   483,   487,   494,   495,   499,
+     510,   521,   532,   545,   551,   561,   567,   573,   578,   582,
+     593,   602,   613,   625,   634,   647,   660,   675,   688,   697,
+     702,   707,   725,   726,   727,   728,   729,   730,   739,   744,
+     751,   759,   764,   777,   785
 };
 #endif
 
@@ -544,9 +549,11 @@ static const char *const yytname[] =
   "OR", "AND", "IF", "ELSE", "WHILE", "FOR", "STRING", "TYPE", "DIFF",
   "SUPEQ", "INFEQ", "EQUAL", "SUP", "INF", "'='", "'>'", "'<'", "\">=\"",
   "\"<=\"", "\"==\"", "\"!=\"", "'+'", "'-'", "'*'", "'/'", "UMOINS",
-  "','", "'('", "')'", "'{'", "';'", "'}'", "$accept", "axiom", "affect1",
-  "list_expr", "affect2", "expr", "number", "increment", "tag", "tagoto",
-  "list", "print", "statement", "condition", "op", YY_NULLPTR
+  "'('", "')'", "'{'", "';'", "'}'", "','", "'['", "']'", "'~'", "$accept",
+  "axiom", "affect1", "list_expr", "ids_matrix", "ids_matrix1",
+  "ids_matrix2", "affect2", "affect_matrix", "expr", "matrix_expr",
+  "number", "increment", "tag", "tagoto", "list", "print", "statement",
+  "condition", "op", "row1", "row2", "list_row", "list_elem", YY_NULLPTR
 };
 #endif
 
@@ -559,16 +566,16 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,    61,    62,
       60,   283,   284,   285,   286,    43,    45,    42,    47,   287,
-      44,    40,    41,   123,    59,   125
+      40,    41,   123,    59,   125,    44,    91,    93,   126
 };
 # endif
 
-#define YYPACT_NINF -61
+#define YYPACT_NINF -112
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-61)))
+  (!!((Yystate) == (-112)))
 
-#define YYTABLE_NINF -33
+#define YYTABLE_NINF -49
 
 #define yytable_value_is_error(Yytable_value) \
   0
@@ -577,19 +584,25 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     127,     2,    14,   -13,    -6,    18,    12,    78,    19,   -61,
-     -61,    55,   -61,    37,   -61,   -61,    21,    68,   -61,   -61,
-     113,    59,    30,   -61,   -61,    38,    77,   -61,    85,    38,
-      38,   -61,   -61,    65,    93,    94,    63,    66,   113,   147,
-     -61,   -61,    98,   113,   107,   -61,   102,   100,    99,   -61,
-     -61,   -61,   -61,   -61,   -61,   109,   113,   113,   113,   113,
-     110,   126,   -61,   102,   102,   154,    42,   102,   107,   106,
-     -61,    58,    58,   -61,   -61,     6,   107,   -61,   133,    47,
-     -61,   -61,   -61,   -61,   -61,   -61,   113,   -61,   -61,   122,
-      50,   -61,   143,   -61,   -61,   147,   102,   102,   -61,   124,
-     102,    66,   157,   -61,    87,   -61,     5,   129,    97,    87,
-     125,   141,   170,   148,   132,   -61,   145,   -61,   151,   -61,
-     -61,    87,    87,   150,   152,   -61,   -61
+     -15,    29,    11,     5,  -112,   -27,     8,   152,    35,    52,
+      26,    39,    93,    12,    56,    49,  -112,  -112,  -112,    95,
+     125,   102,  -112,  -112,    97,   129,   124,  -112,  -112,    27,
+     141,   -19,  -112,  -112,  -112,  -112,    79,   112,  -112,   113,
+      79,   111,    79,  -112,  -112,   121,   122,   133,   142,     9,
+     111,   136,   145,   173,  -112,  -112,  -112,   147,   136,    56,
+     161,  -112,   114,   165,   116,  -112,   163,  -112,  -112,  -112,
+    -112,  -112,   185,  -112,    19,   166,  -112,   136,   136,   136,
+     136,   167,   130,  -112,   168,   114,   114,   162,     3,   114,
+     169,   170,   171,  -112,    92,    92,  -112,  -112,   206,    56,
+      28,  -112,   155,    55,  -112,  -112,  -112,  -112,  -112,  -112,
+     136,  -112,  -112,   175,    75,  -112,  -112,   174,   172,  -112,
+     179,   210,   213,  -112,   173,   114,   114,  -112,   182,   114,
+     215,   198,    32,   183,   181,  -112,   184,   214,  -112,    91,
+    -112,     6,   186,  -112,  -112,   187,   190,   210,    -4,   191,
+      91,    68,  -112,   111,  -112,  -112,   188,   210,   219,   193,
+     197,  -112,   179,   194,  -112,   199,  -112,   200,   195,   201,
+     210,  -112,  -112,   179,  -112,  -112,    91,    91,  -112,   202,
+     203,  -112,  -112
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -597,127 +610,155 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-      26,     0,     0,     0,     0,     0,     0,     0,     0,     4,
-      10,     0,     2,     0,    23,    25,     0,     0,    22,    24,
-       0,     0,     8,     3,     1,    26,     0,    26,     0,    26,
-      26,    20,    21,     0,     0,     0,    17,     0,     0,     9,
-      19,    16,     0,     0,     0,    30,     0,     0,     0,    29,
-      31,    33,    34,    35,    18,     0,     0,     0,     0,     0,
-       0,     7,     6,     0,     0,     0,     0,     0,     0,     0,
-      15,    11,    12,    13,    14,    26,     0,    42,     0,     0,
-      47,    48,    49,    50,    45,    46,     0,    26,    26,     0,
-       0,    26,     0,     5,    43,    44,     0,     0,    26,     0,
-       0,     0,    40,    41,    26,    26,     0,     0,     0,    26,
-       0,     0,    36,     0,     0,    28,     0,    38,     0,    27,
-      26,    26,    26,     0,     0,    37,    39
+       0,     0,     0,     0,     1,     0,     0,    43,     0,     0,
+       0,     0,     0,     0,     0,     0,     4,    21,    22,     0,
+       0,     0,    40,    42,     0,     0,     0,    39,    41,     0,
+       0,     8,     3,     9,    10,    11,    43,     0,    43,     0,
+      43,     0,    43,    37,    38,     0,     0,     0,     0,    31,
+       0,     0,     0,    20,    23,    33,    30,     0,     0,     0,
+       0,    46,     0,     0,     0,    45,     0,    47,    49,    50,
+      51,    52,     0,    32,    31,     0,    34,     0,     0,     0,
+       0,     0,     7,     6,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,    29,    25,    26,    27,    28,     0,     0,
+      15,    59,     0,     0,    64,    65,    66,    67,    62,    63,
+       0,    43,    43,     0,     0,    43,     2,    36,     0,     5,
+       0,     0,     0,    60,    61,     0,     0,    43,     0,     0,
+       0,     0,     0,    14,     0,    13,     0,    57,    58,    43,
+      43,     0,     0,    24,    69,    74,     0,     0,    19,     0,
+      43,     0,    35,     0,    68,    12,     0,     0,    53,     0,
+       0,    73,     0,    18,    17,     0,    55,     0,    71,     0,
+       0,    44,    43,     0,    70,    16,    43,    43,    72,     0,
+       0,    54,    56
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -61,   -61,   153,   -33,    86,    -4,   -14,     0,   -19,   -61,
-     -24,   -61,   -61,   -60,   -61
+    -112,  -112,   180,   -51,  -111,  -112,  -112,    98,  -112,   -26,
+    -112,   -22,    -7,   -34,  -112,   -35,  -112,  -112,   -24,  -112,
+     123,  -112,    77,    99
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_int16 yydefgoto[] =
 {
-      -1,     7,     8,    23,     9,    65,    40,    41,    11,   121,
-      12,    13,    29,    66,    86
+      -1,     2,    15,    32,    33,    34,    35,    16,    17,    87,
+      54,    55,    56,    19,   176,    20,    21,    40,    88,   110,
+     168,   163,   169,   146
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule whose
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_int8 yytable[] =
+static const yytype_int16 yytable[] =
 {
-      10,    45,    34,    77,    79,    49,    50,    90,    47,     1,
-       2,    62,     3,     4,    14,   -32,    39,    21,     5,    87,
-      88,    18,    19,    54,    22,    10,    15,     6,    16,    10,
-      10,    31,    32,    33,    55,    17,   102,   103,   -32,    61,
-     106,     1,     2,    93,     3,     4,    20,   -32,    10,   110,
-       5,    92,    71,    72,    73,    74,    87,    88,    43,     6,
-      78,    87,    88,    25,    87,    88,    18,    19,    96,    97,
-      44,    26,   100,    27,    28,    10,    31,    32,    24,   104,
-     108,    30,    95,   -32,    89,   113,   109,   107,    35,    94,
-       1,     2,    99,     3,     4,    58,    59,   123,   124,     5,
-      42,   122,     1,     2,    10,     1,     2,    51,     6,    10,
-      10,     5,    31,    32,    36,    63,     1,     2,    46,    22,
-      68,    10,    10,    31,    32,    36,    48,   -32,     1,     2,
-       1,     2,   -32,     3,     4,    52,    53,     5,    37,     5,
-      60,    67,   112,    64,    56,    57,    58,    59,     6,    37,
-      91,    70,   101,    75,    38,    80,    81,    82,    83,    84,
-      85,    56,    57,    58,    59,    98,    76,   105,    56,    57,
-      58,    59,    88,   111,   118,    70,    80,    81,    82,    83,
-      84,    85,    56,    57,    58,    59,   115,   116,   119,    56,
-      57,    58,    59,   117,   120,   125,   114,   126,     0,     0,
-       0,    69
+      18,    61,    46,    53,    63,    65,     1,    67,    83,    58,
+     135,     4,    27,    28,     6,    27,    28,   111,   112,    66,
+     111,   112,    27,    28,   156,    75,    59,    60,    73,    18,
+       8,     9,    82,    18,     3,    18,   155,    43,    44,    49,
+      29,   157,    43,    44,   113,     5,   164,    22,   119,   151,
+       7,    94,    95,    96,    97,    72,   120,    18,    30,   175,
+     102,   101,   103,    50,    23,   114,    24,    51,    31,   111,
+     112,     8,     9,   121,   122,    52,   144,   125,   126,    25,
+      13,   129,     8,     9,   124,    10,    11,    12,   -48,   111,
+     112,    13,    36,   139,     8,     9,   123,    10,    11,    12,
+      14,   137,   138,    13,   149,   141,   150,    43,    44,    45,
+     145,    37,    14,    38,    39,   159,   128,     8,     9,     8,
+       9,    43,    44,   -48,    43,    44,    74,    85,    13,    79,
+      80,   145,    18,    26,    41,   -48,    48,    14,   177,     8,
+       9,   179,   180,    18,    18,    42,    43,    44,    74,    47,
+      50,    57,    62,    64,    86,     8,     9,    76,    10,    11,
+      12,   -48,    68,    69,    13,    77,    78,    79,    80,    18,
+      18,    84,    50,    14,    70,    99,    51,   104,   105,   106,
+     107,   108,   109,    71,   104,   105,   106,   107,   108,   109,
+      77,    78,    79,    80,    81,    92,    93,    77,    78,    79,
+      80,    77,    78,    79,    80,    89,    91,    93,    77,    78,
+      79,    80,   115,    98,   116,   100,   118,   127,   117,   131,
+     130,   132,   134,   136,   140,   142,   143,    60,   147,   112,
+     162,   148,   153,   152,   154,   158,   165,   166,   167,   170,
+     173,   171,   172,   133,    90,   174,   181,   182,     0,   160,
+     178,     0,   161
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-       0,    25,    16,    63,    64,    29,    30,    67,    27,     3,
-       4,    44,     6,     7,    12,     9,    20,     5,    12,    14,
-      15,     3,     4,    37,    12,    25,    12,    21,    41,    29,
-      30,    10,    11,    12,    38,    41,    96,    97,     0,    43,
-     100,     3,     4,    76,     6,     7,    28,     9,    48,    44,
-      12,    75,    56,    57,    58,    59,    14,    15,    28,    21,
-      64,    14,    15,    44,    14,    15,     3,     4,    87,    88,
-      40,    16,    91,    18,    19,    75,    10,    11,     0,    98,
-     104,    44,    86,    45,    42,   109,   105,   101,    20,    42,
-       3,     4,    42,     6,     7,    37,    38,   121,   122,    12,
-      41,   120,     3,     4,   104,     3,     4,    42,    21,   109,
-     110,    12,    10,    11,    12,    13,     3,     4,    41,    12,
-      21,   121,   122,    10,    11,    12,    41,     0,     3,     4,
-       3,     4,    45,     6,     7,    42,    42,    12,    36,    12,
-      42,    41,    45,    41,    35,    36,    37,    38,    21,    36,
-      44,    42,     9,    43,    41,    22,    23,    24,    25,    26,
-      27,    35,    36,    37,    38,    43,    40,    43,    35,    36,
-      37,    38,    15,    44,    42,    42,    22,    23,    24,    25,
-      26,    27,    35,    36,    37,    38,    45,    17,    43,    35,
-      36,    37,    38,    45,    43,    45,   110,    45,    -1,    -1,
-      -1,    48
+       7,    36,    24,    29,    38,    40,    21,    42,    59,    28,
+     121,     0,     3,     4,    41,     3,     4,    14,    15,    41,
+      14,    15,     3,     4,    28,    51,    45,    46,    50,    36,
+       3,     4,    58,    40,     5,    42,   147,    10,    11,    12,
+      28,    45,    10,    11,    41,    40,   157,    12,    99,    43,
+      42,    77,    78,    79,    80,    46,    28,    64,    46,   170,
+      86,    85,    86,    36,    12,    89,    40,    40,    12,    14,
+      15,     3,     4,    45,    46,    48,    44,   111,   112,    40,
+      12,   115,     3,     4,   110,     6,     7,     8,     9,    14,
+      15,    12,    43,   127,     3,     4,    41,     6,     7,     8,
+      21,   125,   126,    12,   139,   129,   140,    10,    11,    12,
+     132,    16,    21,    18,    19,   150,    41,     3,     4,     3,
+       4,    10,    11,    44,    10,    11,    12,    13,    12,    37,
+      38,   153,   139,    40,     9,    44,    12,    21,   172,     3,
+       4,   176,   177,   150,   151,    43,    10,    11,    12,    20,
+      36,    10,    40,    40,    40,     3,     4,    12,     6,     7,
+       8,     9,    41,    41,    12,    35,    36,    37,    38,   176,
+     177,    10,    36,    21,    41,    45,    40,    22,    23,    24,
+      25,    26,    27,    41,    22,    23,    24,    25,    26,    27,
+      35,    36,    37,    38,    47,    10,    41,    35,    36,    37,
+      38,    35,    36,    37,    38,    40,    43,    41,    35,    36,
+      37,    38,    43,    46,    44,    47,    10,    42,    47,    47,
+      46,    42,    12,    10,    42,    10,    28,    46,    45,    15,
+      42,    47,    45,    47,    44,    44,    17,    44,    41,    45,
+      45,    42,    42,   120,    64,    44,    44,    44,    -1,   151,
+     173,    -1,   153
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,     6,     7,    12,    21,    47,    48,    50,
-      53,    54,    56,    57,    12,    12,    41,    41,     3,     4,
-      28,     5,    12,    49,     0,    44,    16,    18,    19,    58,
-      44,    10,    11,    12,    52,    20,    12,    36,    41,    51,
-      52,    53,    41,    28,    40,    56,    41,    54,    41,    56,
-      56,    42,    42,    42,    52,    51,    35,    36,    37,    38,
-      42,    51,    49,    13,    41,    51,    59,    41,    21,    48,
-      42,    51,    51,    51,    51,    43,    40,    59,    51,    59,
-      22,    23,    24,    25,    26,    27,    60,    14,    15,    42,
-      59,    44,    56,    49,    42,    51,    54,    54,    43,    42,
-      54,     9,    59,    59,    54,    43,    59,    52,    56,    54,
-      44,    44,    45,    56,    50,    45,    17,    45,    42,    43,
-      43,    55,    54,    56,    56,    45,    45
+       0,    21,    50,     5,     0,    40,    41,    42,     3,     4,
+       6,     7,     8,    12,    21,    51,    56,    57,    61,    62,
+      64,    65,    12,    12,    40,    40,    40,     3,     4,    28,
+      46,    12,    52,    53,    54,    55,    43,    16,    18,    19,
+      66,     9,    43,    10,    11,    12,    60,    20,    12,    12,
+      36,    40,    48,    58,    59,    60,    61,    10,    28,    45,
+      46,    64,    40,    62,    40,    64,    60,    64,    41,    41,
+      41,    41,    46,    60,    12,    58,    12,    35,    36,    37,
+      38,    47,    58,    52,    10,    13,    40,    58,    67,    40,
+      51,    43,    10,    41,    58,    58,    58,    58,    46,    45,
+      47,    67,    58,    67,    22,    23,    24,    25,    26,    27,
+      68,    14,    15,    41,    67,    43,    44,    47,    10,    52,
+      28,    45,    46,    41,    58,    62,    62,    42,    41,    62,
+      46,    47,    42,    69,    12,    53,    10,    67,    67,    62,
+      42,    67,    10,    28,    44,    60,    72,    45,    47,    64,
+      62,    43,    47,    45,    44,    53,    28,    45,    44,    64,
+      56,    72,    42,    70,    53,    17,    44,    41,    69,    71,
+      45,    42,    42,    45,    44,    53,    63,    62,    71,    64,
+      64,    44,    44
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    46,    47,    48,    48,    49,    49,    49,    49,    50,
-      50,    51,    51,    51,    51,    51,    51,    51,    51,    51,
-      52,    52,    53,    53,    53,    53,    54,    55,    56,    56,
-      56,    56,    56,    57,    57,    57,    58,    58,    58,    58,
-      59,    59,    59,    59,    59,    60,    60,    60,    60,    60,
-      60
+       0,    49,    50,    51,    51,    52,    52,    52,    52,    52,
+      53,    53,    54,    54,    54,    54,    55,    55,    55,    55,
+      56,    56,    56,    57,    57,    58,    58,    58,    58,    58,
+      58,    58,    58,    58,    59,    59,    59,    60,    60,    61,
+      61,    61,    61,    62,    63,    64,    64,    64,    64,    65,
+      65,    65,    65,    66,    66,    66,    66,    67,    67,    67,
+      67,    67,    68,    68,    68,    68,    68,    68,    69,    69,
+      70,    71,    71,    72,    72
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     2,     1,     5,     3,     3,     1,     3,
-       1,     3,     3,     3,     3,     3,     1,     1,     2,     1,
-       1,     1,     2,     2,     2,     2,     0,     0,    10,     3,
-       3,     3,     0,     4,     4,     4,     8,    13,     9,    13,
-       4,     4,     2,     3,     3,     1,     1,     1,     1,     1,
-       1
+       0,     2,    10,     2,     1,     5,     3,     3,     1,     1,
+       1,     1,     8,     6,     6,     4,    11,     9,     9,     7,
+       3,     1,     1,     3,     8,     3,     3,     3,     3,     3,
+       1,     1,     2,     1,     2,     7,     4,     1,     1,     2,
+       2,     2,     2,     0,     0,     3,     3,     3,     0,     4,
+       4,     4,     4,     8,    13,     9,    13,     4,     4,     2,
+       3,     3,     1,     1,     1,     1,     1,     1,     3,     2,
+       3,     1,     3,     3,     1
 };
 
 
@@ -1394,69 +1435,82 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 83 "compilateur.y" /* yacc.c:1646  */
+#line 86 "compilateur.y" /* yacc.c:1646  */
     { 
-        printf("Match\n");
-        (yyval.code_statement).code = (yyvsp[0].code_statement).code;
-        code = (yyvsp[0].code_statement).code;
-        printf("---TDS---\n");
-        symbol_print(tds);
-        printf("---CODE---\n");
-        quad_print(code);
-        //exit(0);
-      }
-#line 1409 "y.tab.c" /* yacc.c:1646  */
+                                                    printf("Match\n");
+                                                    (yyval.code_statement).code = (yyvsp[-4].code_statement).code;
+                                                    code = (yyvsp[-4].code_statement).code;
+                                                    printf("---TDS---\n");
+                                                    symbol_print(tds);
+                                                    printf("---CODE---\n");
+                                                    quad_print(code);
+                                                    //exit(0);
+                                                  }
+#line 1450 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 98 "compilateur.y" /* yacc.c:1646  */
+#line 100 "compilateur.y" /* yacc.c:1646  */
     {
             (yyval.codegen).result = (yyvsp[0].codegen).result;
-            (yyval.codegen).result->type = strdup((yyvsp[-1].string));
+            (yyval.codegen).result->type = (yyvsp[-1].string);
+            /*struct symbol *temp=$2.result;
+            while(temp!=NULL)
+            {
+              temp->type=$$.result->type;
+              temp=temp->next;
+            }*/
             (yyval.codegen).code = (yyvsp[0].codegen).code;
             symbol_complete(&tds,(yyvsp[-1].string));
           }
-#line 1420 "y.tab.c" /* yacc.c:1646  */
+#line 1467 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 104 "compilateur.y" /* yacc.c:1646  */
+#line 112 "compilateur.y" /* yacc.c:1646  */
     {
               (yyval.codegen).result = (yyvsp[0].codegen).result;
               (yyval.codegen).code = (yyvsp[0].codegen).code;
             }
-#line 1429 "y.tab.c" /* yacc.c:1646  */
+#line 1476 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 113 "compilateur.y" /* yacc.c:1646  */
+#line 120 "compilateur.y" /* yacc.c:1646  */
     {
                                 struct symbol * affect = symbol_add(&tds, (yyvsp[-4].string));
                                 affect->value = (yyvsp[-2].codegen).result->value;
                                 affect->isconstant = false;
                                 (yyval.codegen).result = affect;
                                 
-                                (yyval.codegen).code = concatQuad(quad_gen(&nextquad, "=", (yyvsp[-2].codegen).result, NULL, affect),(yyvsp[0].codegen).code);
+                                (yyval.codegen).code = quad_gen(&nextquad, "=", (yyvsp[-2].codegen).result, NULL, affect);
+                                quad_add(&(yyval.codegen).code, (yyvsp[-2].codegen).code);
+                                quad_add(&(yyval.codegen).code, (yyvsp[0].codegen).code);
+                                
+                                // $$.code = concatQuad(quad_gen(&nextquad, "=", $3.result, NULL, affect),$5.code);
                                 nextquad++;
                               }
-#line 1443 "y.tab.c" /* yacc.c:1646  */
+#line 1494 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 122 "compilateur.y" /* yacc.c:1646  */
+#line 133 "compilateur.y" /* yacc.c:1646  */
     {
                       struct symbol * affect = symbol_add(&tds, (yyvsp[-2].string));
                       affect->isconstant = false;
                       (yyval.codegen).result = affect;
                       
-                      (yyval.codegen).code = concatQuad(quad_gen(&nextquad, "", NULL, NULL, affect),(yyvsp[0].codegen).code);
+                      (yyval.codegen).code = quad_gen(&nextquad, "", NULL, NULL, affect);
+                      quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
+                      
+                      //$$.code = concatQuad(quad_gen(&nextquad, "", NULL, NULL, affect),$3.code);
                       nextquad++;
                     }
-#line 1456 "y.tab.c" /* yacc.c:1646  */
+#line 1510 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 131 "compilateur.y" /* yacc.c:1646  */
+#line 145 "compilateur.y" /* yacc.c:1646  */
     {
                   struct symbol * affect = symbol_add(&tds, (yyvsp[-2].string));
                   affect->value = (yyvsp[0].codegen).result->value;
@@ -1464,13 +1518,17 @@ yyreduce:
                   (yyval.codegen).result = affect;
                   
                   (yyval.codegen).code = quad_gen(&nextquad, "=", (yyvsp[0].codegen).result, NULL, affect);
+                  quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
                   nextquad++;
+                  printf("hello\n");
+                  quad_print((yyval.codegen).code);
+                  printf("endHello\n");
                 }
-#line 1470 "y.tab.c" /* yacc.c:1646  */
+#line 1528 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 140 "compilateur.y" /* yacc.c:1646  */
+#line 158 "compilateur.y" /* yacc.c:1646  */
     {
           struct symbol * affect = symbol_add(&tds, (yyvsp[0].string));
           affect->isconstant = false;
@@ -1479,196 +1537,536 @@ yyreduce:
           (yyval.codegen).code = quad_gen(&nextquad, "", NULL, NULL, affect);
           nextquad++;
         }
-#line 1483 "y.tab.c" /* yacc.c:1646  */
+#line 1541 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 151 "compilateur.y" /* yacc.c:1646  */
+#line 166 "compilateur.y" /* yacc.c:1646  */
     {
-                struct symbol * affect = symbol_lookup(tds, (yyvsp[-2].string));
-                affect->value = (yyvsp[0].codegen).result->value;
-                (yyval.codegen).result = affect;
-                
-                (yyval.codegen).code = quad_gen(&nextquad, "=", (yyvsp[0].codegen).result, NULL, affect);
-                nextquad++;
-              }
-#line 1496 "y.tab.c" /* yacc.c:1646  */
+                  (yyval.codegen).result = (yyvsp[0].codegen).result;
+                  (yyval.codegen).code = (yyvsp[0].codegen).code;
+                }
+#line 1550 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 159 "compilateur.y" /* yacc.c:1646  */
+#line 173 "compilateur.y" /* yacc.c:1646  */
+    {
+                  (yyval.codegen).result = (yyvsp[0].codegen).result;
+                  (yyval.codegen).code = (yyvsp[0].codegen).code;
+                }
+#line 1559 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 177 "compilateur.y" /* yacc.c:1646  */
+    {
+                  (yyval.codegen).result = (yyvsp[0].codegen).result;
+                  (yyval.codegen).code = (yyvsp[0].codegen).code;
+                }
+#line 1568 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 185 "compilateur.y" /* yacc.c:1646  */
+    {
+                                              struct symbol * affect = symbol_add(&tds, (yyvsp[-7].string));
+                                              affect->matrix=malloc(sizeof(struct matrix_float*));
+                                              affect->matrix=malloc(sizeof(float*));
+                                              affect->matrix->row = 1;
+                                              affect->matrix->column = (int)(yyvsp[-5].value);
+                                              affect->matrix->tab=malloc(sizeof(float*));
+                                              affect->matrix->tab[0]=malloc((yyvsp[-5].value)*sizeof(float));
+                                              affect->type="matrix";
+                                              affect->isconstant = false;
+                                              (yyval.codegen).result = affect;
+                                              
+                                              //$$.code = concatQuad($6.code,$8.code);
+                                              (yyval.codegen).code=(yyvsp[-2].codegen).code;
+                                              quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
+                                            }
+#line 1589 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 13:
+#line 201 "compilateur.y" /* yacc.c:1646  */
+    {
+                                    struct symbol * affect = symbol_add(&tds, (yyvsp[-5].string));
+                                    affect->matrix=malloc(sizeof(struct matrix_float*));
+                                    affect->matrix->row = 1;
+                                    affect->matrix->column = (int)(yyvsp[-3].value);
+                                    affect->matrix->tab=malloc(sizeof(float*));
+                                    affect->matrix->tab[0]=malloc((yyvsp[-3].value)*sizeof(float));
+                                    affect->type="matrix";
+                                    affect->isconstant = false;
+                                    (yyval.codegen).result = affect;
+                                    
+                                    //$$.code = concatQuad(quad_gen(&nextquad, "", NULL, NULL, affect),$6.code);
+                                    (yyval.codegen).code=quad_gen(&nextquad, "", NULL, NULL, affect);
+                                    quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
+                                    nextquad++;
+                                  }
+#line 1610 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 217 "compilateur.y" /* yacc.c:1646  */
+    {
+                              struct symbol * affect = symbol_add(&tds, (yyvsp[-5].string));
+                              affect->matrix=malloc(sizeof(struct matrix_float*));
+                              affect->matrix->row = 1;
+                              affect->matrix->column = (int)(yyvsp[-3].value);
+                              affect->matrix->tab=malloc(sizeof(float*));
+                              affect->matrix->tab[0]=malloc((yyvsp[-3].value)*sizeof(float));
+                              affect->type="matrix";
+                              affect->isconstant = false;
+                              (yyval.codegen).result = affect;
+                              
+                              (yyval.codegen).code = (yyvsp[0].codegen).code;
+                            }
+#line 1628 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 230 "compilateur.y" /* yacc.c:1646  */
+    {
+                      struct symbol * affect = symbol_add(&tds, (yyvsp[-3].string));
+                      affect->matrix=malloc(sizeof(struct matrix_float*));
+                      affect->matrix->row = 1;
+                      affect->matrix->column = (int)(yyvsp[-1].value);
+                      affect->matrix->tab=malloc(sizeof(float*));
+                      affect->matrix->tab[0]=malloc((yyvsp[-1].value)*sizeof(float));
+                      affect->type="matrix";
+                      affect->isconstant = false;
+                      (yyval.codegen).result = affect;
+                      
+                      (yyval.codegen).code = quad_gen(&nextquad, "", NULL, NULL, affect);
+                    }
+#line 1646 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 16:
+#line 246 "compilateur.y" /* yacc.c:1646  */
+    {
+                                                          struct symbol * affect = symbol_add(&tds, (yyvsp[-10].string));
+                                                          affect->matrix=malloc(sizeof(struct matrix_float*));
+                                                          affect->matrix->row = (int)(yyvsp[-8].value);
+                                                          affect->matrix->column = (int)(yyvsp[-5].value);
+                                                          affect->matrix->tab=malloc((yyvsp[-8].value)*sizeof(float*));
+                                                          int i;
+                                                          for(i=0;i<(yyvsp[-8].value);i++)
+                                                          {
+                                                            affect->matrix->tab[i]=malloc((yyvsp[-5].value)*sizeof(float));
+                                                          }
+                                                          affect->type="matrix";
+                                                          affect->isconstant = false;
+                                                          (yyval.codegen).result = affect;
+                                                          
+                                                          (yyval.codegen).code=(yyvsp[-2].codegen).code;
+                                                          quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
+                                                          
+                                                          //$$.code = concatQuad($9.code,$11.code);
+                                                        }
+#line 1671 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 17:
+#line 266 "compilateur.y" /* yacc.c:1646  */
+    {
+                                                struct symbol * affect = symbol_add(&tds, (yyvsp[-8].string));
+                                                affect->matrix=malloc(sizeof(struct matrix_float*));
+                                                affect->matrix->row = (int)(yyvsp[-6].value);
+                                                affect->matrix->column = (int)(yyvsp[-3].value);
+                                                affect->matrix->tab=malloc((yyvsp[-6].value)*sizeof(float*));
+                                                int i;
+                                                for(i=0;i<(yyvsp[-6].value);i++)
+                                                {
+                                                  affect->matrix->tab[i]=malloc((yyvsp[-3].value)*sizeof(float));
+                                                }
+                                                affect->type="matrix";
+                                                affect->isconstant = false;
+                                                (yyval.codegen).result = affect;
+                                                
+                                                // $$.code = concatQuad(quad_gen(&nextquad, "", NULL, NULL, affect),$9.code);
+                                                
+                                                (yyval.codegen).code = quad_gen(&nextquad, "", NULL, NULL, affect);
+                                                quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
+                                                nextquad++;
+                                              }
+#line 1697 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 18:
+#line 287 "compilateur.y" /* yacc.c:1646  */
+    {
+                                          struct symbol * affect = symbol_add(&tds, (yyvsp[-8].string));
+                                          affect->matrix=malloc(sizeof(struct matrix_float*));
+                                          affect->matrix->row = (int)(yyvsp[-6].value);
+                                          affect->matrix->column = (int)(yyvsp[-3].value);
+                                          affect->matrix->tab=malloc((yyvsp[-6].value)*sizeof(float*));
+                                          int i;
+                                          for(i=0;i<(yyvsp[-6].value);i++)
+                                          {
+                                            affect->matrix->tab[i]=malloc((yyvsp[-3].value)*sizeof(float));
+                                          }
+                                          affect->type="matrix";
+                                          affect->isconstant = false;
+                                          (yyval.codegen).result = affect;
+                                          
+                                          (yyval.codegen).code = (yyvsp[0].codegen).code;
+                                        }
+#line 1719 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 304 "compilateur.y" /* yacc.c:1646  */
+    {
+                                  struct symbol * affect = symbol_add(&tds, (yyvsp[-6].string));
+                                  affect->matrix=malloc(sizeof(struct matrix_float*));
+                                  affect->matrix->row = (int)(yyvsp[-4].value);
+                                  affect->matrix->column = (int)(yyvsp[-1].value);
+                                  affect->matrix->tab=malloc((yyvsp[-4].value)*sizeof(float*));
+                                  int i;
+                                  for(i=0;i<(yyvsp[-4].value);i++)
+                                  {
+                                    affect->matrix->tab[i]=malloc((yyvsp[-1].value)*sizeof(float));
+                                  }
+                                  affect->type="matrix";
+                                  affect->isconstant = false;
+                                  (yyval.codegen).result = affect;
+                                  
+                                  (yyval.codegen).code = quad_gen(&nextquad, "", NULL, NULL, affect);
+                                }
+#line 1741 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 324 "compilateur.y" /* yacc.c:1646  */
+    {
+                struct symbol * affect = symbol_lookup(tds, (yyvsp[-2].string));
+                
+                printf("%s value : %f\n",(yyvsp[0].codegen).result->id, (yyvsp[0].codegen).result->value);
+                /*struct symbol *temp=affect;
+                while(temp!=NULL)
+                {
+                  temp->type=affect->type;
+                  temp=temp->next;
+                }*/
+                if(affect == NULL)
+                {
+                  errorManagement(strcat(strcat("L'id ",(yyvsp[-2].string)),"n'est pas exisant\n"));
+                }
+                affect->value = (yyvsp[0].codegen).result->value;
+                
+                (yyval.codegen).result = affect;
+                
+                (yyval.codegen).code = quad_gen(&nextquad, "=", (yyvsp[0].codegen).result, NULL, affect);
+                quad_add(&(yyval.codegen).code,(yyvsp[0].codegen).code);
+                nextquad++;
+              }
+#line 1768 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 346 "compilateur.y" /* yacc.c:1646  */
+    {
+                    (yyval.codegen).code = (yyvsp[0].codegen).code;
+                    (yyvsp[0].codegen).result = (yyvsp[0].codegen).result;
+                  }
+#line 1777 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 350 "compilateur.y" /* yacc.c:1646  */
     {
                 (yyval.codegen).result = (yyvsp[0].codegen).result;
                 (yyval.codegen).code = (yyvsp[0].codegen).code;
               }
-#line 1505 "y.tab.c" /* yacc.c:1646  */
+#line 1786 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 11:
-#line 167 "compilateur.y" /* yacc.c:1646  */
+  case 23:
+#line 358 "compilateur.y" /* yacc.c:1646  */
+    {
+                          struct symbol * affect = symbol_lookup(tds, (yyvsp[-2].string));
+                          if(affect == NULL)
+                          {
+                            errorManagement(strcat(strcat("L'id ",(yyvsp[-2].string)),"n'est pas exisant\n"));
+                          }
+                          //affect->value = $3.result->value;
+                          (yyval.codegen).result = affect;
+                          
+                          (yyval.codegen).code = quad_gen(&nextquad, "=", (yyvsp[0].codegen).result, NULL, affect);
+                          nextquad++;
+                        }
+#line 1803 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 370 "compilateur.y" /* yacc.c:1646  */
+    {
+                                      (yyval.codegen).result=NULL;
+                                      (yyval.codegen).code=NULL;
+                                    }
+#line 1812 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 377 "compilateur.y" /* yacc.c:1646  */
     {   
                         (yyval.codegen).result = symbol_newtemp(&tds);
+                        (yyval.codegen).result->value = (yyvsp[-2].codegen).result->value + (yyvsp[0].codegen).result->value;
+                        if(strcmp((yyvsp[-2].codegen).result->type,"int")==0 && strcmp((yyvsp[0].codegen).result->type,"int")==0)
+                        {
+                          (yyval.codegen).result->type = (yyvsp[-2].codegen).result->type;
+                        }
+                        else
+                        {
+                          (yyval.codegen).result->type = "float";
+                        }
                         (yyval.codegen).code = (yyvsp[-2].codegen).code;
                         quad_add(&(yyval.codegen).code, (yyvsp[0].codegen).code);
                         quad_add(&(yyval.codegen).code, quad_gen(&nextquad,"+", (yyvsp[-2].codegen).result, (yyvsp[0].codegen).result, (yyval.codegen).result));
                         nextquad++;
                     }
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 1833 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 12:
-#line 174 "compilateur.y" /* yacc.c:1646  */
+  case 26:
+#line 393 "compilateur.y" /* yacc.c:1646  */
     {   
                         (yyval.codegen).result = symbol_newtemp(&tds);
+                        (yyval.codegen).result->value = (yyvsp[-2].codegen).result->value - (yyvsp[0].codegen).result->value;
+                        if(strcmp((yyvsp[-2].codegen).result->type,"int") == 0 && strcmp((yyvsp[0].codegen).result->type,"int") ==0)
+                        {
+                          (yyval.codegen).result->type = (yyvsp[-2].codegen).result->type;
+                        }
+                        else
+                        {
+                          (yyval.codegen).result->type = "float";
+                        }
                         (yyval.codegen).code = (yyvsp[-2].codegen).code;
                         quad_add(&(yyval.codegen).code, (yyvsp[0].codegen).code);
                         quad_add(&(yyval.codegen).code, quad_gen(&nextquad,"-", (yyvsp[-2].codegen).result, (yyvsp[0].codegen).result, (yyval.codegen).result));
                         nextquad++;
                     }
-#line 1529 "y.tab.c" /* yacc.c:1646  */
+#line 1854 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 181 "compilateur.y" /* yacc.c:1646  */
+  case 27:
+#line 409 "compilateur.y" /* yacc.c:1646  */
     {   
                         (yyval.codegen).result = symbol_newtemp(&tds);
+                        (yyval.codegen).result->value = (yyvsp[-2].codegen).result->value * (yyvsp[0].codegen).result->value;
+                        if(strcmp((yyvsp[-2].codegen).result->type,"int") == 0 && strcmp((yyvsp[0].codegen).result->type,"int") ==0)
+                        {
+                          (yyval.codegen).result->type = (yyvsp[-2].codegen).result->type;
+                        }
+                        else
+                        {
+                          (yyval.codegen).result->type = "float";
+                        }
                         (yyval.codegen).code = (yyvsp[-2].codegen).code;
                         quad_add(&(yyval.codegen).code, (yyvsp[0].codegen).code);
                         quad_add(&(yyval.codegen).code, quad_gen(&nextquad,"*", (yyvsp[-2].codegen).result, (yyvsp[0].codegen).result, (yyval.codegen).result));
                         nextquad++;
                     }
-#line 1541 "y.tab.c" /* yacc.c:1646  */
+#line 1875 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 188 "compilateur.y" /* yacc.c:1646  */
+  case 28:
+#line 425 "compilateur.y" /* yacc.c:1646  */
     {   
                         (yyval.codegen).result = symbol_newtemp(&tds);
+                       
+                        (yyval.codegen).result->value = (yyvsp[-2].codegen).result->value / (yyvsp[0].codegen).result->value;
+                        
+                        if(strcmp((yyvsp[-2].codegen).result->type,"int") == 0 && strcmp((yyvsp[0].codegen).result->type,"int") ==0)
+                        {
+                          (yyval.codegen).result->type = (yyvsp[-2].codegen).result->type;
+                        }
+                        else
+                        {
+                          (yyval.codegen).result->type = "float";
+                        }
                         (yyval.codegen).code = (yyvsp[-2].codegen).code;
                         quad_add(&(yyval.codegen).code, (yyvsp[0].codegen).code);
                         quad_add(&(yyval.codegen).code, quad_gen(&nextquad,"/", (yyvsp[-2].codegen).result, (yyvsp[0].codegen).result, (yyval.codegen).result));
                         nextquad++;
                     }
-#line 1553 "y.tab.c" /* yacc.c:1646  */
+#line 1898 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 15:
-#line 195 "compilateur.y" /* yacc.c:1646  */
+  case 29:
+#line 443 "compilateur.y" /* yacc.c:1646  */
     {   
                         (yyval.codegen).result = (yyvsp[-1].codegen).result;
                         (yyval.codegen).code = (yyvsp[-1].codegen).code;
                     }
-#line 1562 "y.tab.c" /* yacc.c:1646  */
+#line 1907 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 199 "compilateur.y" /* yacc.c:1646  */
-    {(yyval.codegen) = (yyvsp[0].codegen);}
-#line 1568 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 201 "compilateur.y" /* yacc.c:1646  */
-    {   
-                        (yyval.codegen).result = symbol_add(&tds, (yyvsp[0].string));
-                        (yyval.codegen).code = NULL;
+  case 30:
+#line 447 "compilateur.y" /* yacc.c:1646  */
+    {
+                      (yyval.codegen).result = (yyvsp[0].codegen).result;
+                      (yyval.codegen).code = (yyvsp[0].codegen).code;
                     }
-#line 1577 "y.tab.c" /* yacc.c:1646  */
+#line 1916 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 205 "compilateur.y" /* yacc.c:1646  */
+  case 31:
+#line 452 "compilateur.y" /* yacc.c:1646  */
+    {   
+                        struct symbol* temp = symbol_lookup(tds,(yyvsp[0].string));
+                        if(temp == NULL)
+                        {
+                          errorManagement(strcat(strcat("L'id ",(yyvsp[0].string)),"n'est pas exisant\n"));
+                        }
+                        (yyval.codegen).result = temp;
+                        (yyval.codegen).code = NULL;
+                        // $$.result = symbol_add(&tds, $1);
+                        // $$.code = NULL;
+                    }
+#line 1932 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 463 "compilateur.y" /* yacc.c:1646  */
     {
                         (yyval.codegen).result = symbol_newtemp(&tds);
                         (yyval.codegen).result->type = (yyvsp[0].num).type;
                         (yyval.codegen).result->value = - (yyvsp[0].num).value;
                         (yyval.codegen).code = NULL;
                     }
-#line 1588 "y.tab.c" /* yacc.c:1646  */
+#line 1943 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 19:
-#line 211 "compilateur.y" /* yacc.c:1646  */
+  case 33:
+#line 469 "compilateur.y" /* yacc.c:1646  */
     {   
                         (yyval.codegen).result = symbol_newtemp(&tds);
                         (yyval.codegen).result->type = (yyvsp[0].num).type;
                         (yyval.codegen).result->value = (yyvsp[0].num).value;
                         (yyval.codegen).code = NULL;
                     }
-#line 1599 "y.tab.c" /* yacc.c:1646  */
+#line 1954 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 220 "compilateur.y" /* yacc.c:1646  */
+  case 34:
+#line 479 "compilateur.y" /* yacc.c:1646  */
+    {
+              (yyval.codegen).code = NULL;
+              (yyval.codegen).result = NULL;
+            }
+#line 1963 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 483 "compilateur.y" /* yacc.c:1646  */
+    {
+                                  (yyval.codegen).code = NULL;
+                                  (yyval.codegen).result = NULL;
+                                }
+#line 1972 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 487 "compilateur.y" /* yacc.c:1646  */
+    {
+                      (yyval.codegen).code = NULL;
+                      (yyval.codegen).result = NULL;
+                    }
+#line 1981 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 494 "compilateur.y" /* yacc.c:1646  */
     { (yyval.num).value=(yyvsp[0].value); (yyval.num).type="int";}
-#line 1605 "y.tab.c" /* yacc.c:1646  */
+#line 1987 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 221 "compilateur.y" /* yacc.c:1646  */
+  case 38:
+#line 495 "compilateur.y" /* yacc.c:1646  */
     { (yyval.num).value=(yyvsp[0].value); (yyval.num).type="float";}
-#line 1611 "y.tab.c" /* yacc.c:1646  */
+#line 1993 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 225 "compilateur.y" /* yacc.c:1646  */
+  case 39:
+#line 499 "compilateur.y" /* yacc.c:1646  */
     {
                       struct symbol* temp = symbol_lookup(tds,(yyvsp[-1].string));
+                      if(temp == NULL)
+                      {
+                        errorManagement(strcat(strcat("L'id ",(yyvsp[-1].string)),"n'est pas exisant\n"));
+                      }
                       temp->value += 1;
                       (yyval.codegen).result = temp;
                       (yyval.codegen).code = quad_gen(&nextquad,"++", temp, NULL, (yyval.codegen).result);
                       nextquad++;
                     }
-#line 1623 "y.tab.c" /* yacc.c:1646  */
+#line 2009 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 232 "compilateur.y" /* yacc.c:1646  */
+  case 40:
+#line 510 "compilateur.y" /* yacc.c:1646  */
     {
                       struct symbol* temp = symbol_lookup(tds,(yyvsp[0].string));
+                      if(temp == NULL)
+                      {
+                        errorManagement(strcat(strcat("L'id ",(yyvsp[0].string)),"n'est pas exisant\n"));
+                      }
                       temp->value += 1;
                       (yyval.codegen).result = temp;
                       (yyval.codegen).code = quad_gen(&nextquad,"++", NULL, temp, (yyval.codegen).result);
                       nextquad++;
                     }
-#line 1635 "y.tab.c" /* yacc.c:1646  */
+#line 2025 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 239 "compilateur.y" /* yacc.c:1646  */
+  case 41:
+#line 521 "compilateur.y" /* yacc.c:1646  */
     {
                       struct symbol* temp = symbol_lookup(tds,(yyvsp[-1].string));
+                      if(temp == NULL)
+                      {
+                        errorManagement(strcat(strcat("L'id ",(yyvsp[-1].string)),"n'est pas exisant\n"));
+                      }
                       temp->value -= 1;
                       (yyval.codegen).result = temp;
                       (yyval.codegen).code = quad_gen(&nextquad,"--", temp, NULL , (yyval.codegen).result);
                       nextquad++;
                     }
-#line 1647 "y.tab.c" /* yacc.c:1646  */
+#line 2041 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 246 "compilateur.y" /* yacc.c:1646  */
+  case 42:
+#line 532 "compilateur.y" /* yacc.c:1646  */
     {
                       struct symbol* temp = symbol_lookup(tds,(yyvsp[0].string));
+                      if(temp == NULL)
+                      {
+                        errorManagement(strcat(strcat("L'id ",(yyvsp[0].string)),"n'est pas exisant\n"));
+                      }
                       temp->value -= 1;
                       (yyval.codegen).result = temp;
                       (yyval.codegen).code = quad_gen(&nextquad,"--", NULL, temp, (yyval.codegen).result);
                       nextquad++;
                     }
-#line 1659 "y.tab.c" /* yacc.c:1646  */
+#line 2057 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 272 "compilateur.y" /* yacc.c:1646  */
+  case 43:
+#line 545 "compilateur.y" /* yacc.c:1646  */
     {
         (yyval.label) = symbol_newlabel(&tds, nextquad);
         nextquad++;
       }
-#line 1668 "y.tab.c" /* yacc.c:1646  */
+#line 2066 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 278 "compilateur.y" /* yacc.c:1646  */
+  case 44:
+#line 551 "compilateur.y" /* yacc.c:1646  */
     {
             (yyval.code_goto).code = quad_gen(&nextquad,"goto", NULL, NULL, NULL);
             nextquad++;
@@ -1676,68 +2074,63 @@ yyreduce:
             nextquad++;
             (yyval.code_goto).nextlist = newlist((yyval.code_goto).code);
           }
-#line 1680 "y.tab.c" /* yacc.c:1646  */
+#line 2078 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 288 "compilateur.y" /* yacc.c:1646  */
-    {
-                                                      (yyval.code_statement).code = (yyvsp[-4].code_statement).code;
-                                                      (yyval.code_statement).nextlist = (yyvsp[-4].code_statement).nextlist;
-                                                    }
-#line 1689 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 293 "compilateur.y" /* yacc.c:1646  */
+  case 45:
+#line 561 "compilateur.y" /* yacc.c:1646  */
     {
                           complete((yyvsp[0].code_statement).nextlist,(yyvsp[-2].label));
                           (yyval.code_statement).nextlist = (yyvsp[-1].code_statement).nextlist;
-                          (yyval.code_statement).code = concatQuad((yyvsp[-1].code_statement).code, (yyvsp[0].code_statement).code); 
+                          (yyval.code_statement).code = (yyvsp[-1].code_statement).code;
+                          quad_add(&(yyval.code_statement).code,(yyvsp[0].code_statement).code);
                         }
-#line 1699 "y.tab.c" /* yacc.c:1646  */
+#line 2089 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 299 "compilateur.y" /* yacc.c:1646  */
+  case 46:
+#line 568 "compilateur.y" /* yacc.c:1646  */
     {
                       (yyval.code_statement).nextlist = newlist((yyvsp[-2].codegen).code);
-                      (yyval.code_statement).code = concatQuad((yyvsp[-2].codegen).code, (yyvsp[0].code_statement).code);
+                      (yyval.code_statement).code=(yyvsp[-2].codegen).code;
+                      quad_add(&(yyval.code_statement).code,(yyvsp[0].code_statement).code);
                     }
-#line 1708 "y.tab.c" /* yacc.c:1646  */
+#line 2099 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 303 "compilateur.y" /* yacc.c:1646  */
+  case 47:
+#line 573 "compilateur.y" /* yacc.c:1646  */
     {
                       (yyval.code_statement).nextlist = newlist((yyvsp[-2].codegen).code);
-                      // printf("print -- $3.code --");
-                      // quad_print($3.code);
-                      // printf("endPrint -- $3.code -- \n");
-                      (yyval.code_statement).code = concatQuad((yyvsp[-2].codegen).code, (yyvsp[0].code_statement).code);
+                      (yyval.code_statement).code = (yyvsp[-2].codegen).code;
+                      quad_add(&(yyval.code_statement).code,(yyvsp[0].code_statement).code);
                    }
-#line 1720 "y.tab.c" /* yacc.c:1646  */
+#line 2109 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 32:
-#line 310 "compilateur.y" /* yacc.c:1646  */
+  case 48:
+#line 578 "compilateur.y" /* yacc.c:1646  */
     {(yyval.code_statement).code=NULL;/* empty */}
-#line 1726 "y.tab.c" /* yacc.c:1646  */
+#line 2115 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 315 "compilateur.y" /* yacc.c:1646  */
+  case 49:
+#line 583 "compilateur.y" /* yacc.c:1646  */
     {
       struct symbol * affect = symbol_lookup(tds, (yyvsp[-1].string));
+      if(affect == NULL)
+      {
+        errorManagement(strcat(strcat("L'id ",(yyvsp[-1].string)),"n'est pas exisant\n"));
+      }
       (yyval.codegen).code = quad_gen(&nextquad,"print",affect,NULL,NULL);
       (yyval.codegen).result = affect;
       nextquad++;
     }
-#line 1737 "y.tab.c" /* yacc.c:1646  */
+#line 2130 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 322 "compilateur.y" /* yacc.c:1646  */
+  case 50:
+#line 594 "compilateur.y" /* yacc.c:1646  */
     {
       struct symbol * temp = symbol_newtemp(&tds); 
       temp->type = (yyvsp[-1].num).type;
@@ -1746,69 +2139,95 @@ yyreduce:
       (yyval.codegen).result = temp;
       nextquad++;
     }
-#line 1750 "y.tab.c" /* yacc.c:1646  */
+#line 2143 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 35:
-#line 331 "compilateur.y" /* yacc.c:1646  */
+  case 51:
+#line 603 "compilateur.y" /* yacc.c:1646  */
     {
       struct symbol * temp = symbol_newtemp(&tds); 
       temp->type = "string";
       temp->id = strdup((yyvsp[-1].string));
+      temp->value = nb_string;
+      nb_string++;
       (yyval.codegen).code = quad_gen(&nextquad,"printf",temp,NULL,NULL);
       (yyval.codegen).result = temp;
       nextquad++;
    }
-#line 1763 "y.tab.c" /* yacc.c:1646  */
+#line 2158 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 36:
-#line 345 "compilateur.y" /* yacc.c:1646  */
+  case 52:
+#line 614 "compilateur.y" /* yacc.c:1646  */
+    {
+      struct symbol * temp = symbol_newtemp(&tds); 
+      temp->type = "string";
+      temp->id = (yyvsp[-1].string);
+      (yyval.codegen).code = quad_gen(&nextquad,"printmat",temp,NULL,NULL);
+      (yyval.codegen).result = temp;
+      nextquad++;
+   }
+#line 2171 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 53:
+#line 627 "compilateur.y" /* yacc.c:1646  */
     { 
         complete((yyvsp[-5].code_condition).truelist,(yyvsp[-2].label));
-        (yyval.code_statement).nextlist=concatList((yyvsp[-1].code_statement).nextlist,(yyvsp[-5].code_condition).falselist);
-        (yyval.code_statement).code=concatQuad((yyvsp[-5].code_condition).code,(yyvsp[-1].code_statement).code);
+        (yyval.code_statement).nextlist = concatList((yyvsp[-1].code_statement).nextlist,(yyvsp[-5].code_condition).falselist);
+        (yyval.code_statement).code = (yyvsp[-5].code_condition).code;
+        quad_add(&(yyval.code_statement).code,(yyvsp[-1].code_statement).code);
       }
-#line 1773 "y.tab.c" /* yacc.c:1646  */
+#line 2182 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 37:
-#line 353 "compilateur.y" /* yacc.c:1646  */
+  case 54:
+#line 636 "compilateur.y" /* yacc.c:1646  */
     { 
         complete((yyvsp[-10].code_condition).truelist,(yyvsp[-7].label));
         complete((yyvsp[-10].code_condition).falselist,(yyvsp[-2].code_goto).quad);
         (yyval.code_statement).nextlist=concatList(concatList((yyvsp[-6].code_statement).nextlist,(yyvsp[-1].code_statement).nextlist),(yyvsp[-2].code_goto).nextlist);
-        (yyval.code_statement).code=concatQuad(concatQuad(concatQuad((yyvsp[-10].code_condition).code,(yyvsp[-6].code_statement).code),(yyvsp[-2].code_goto).code),(yyvsp[-1].code_statement).code);
+        (yyval.code_statement).code=(yyvsp[-10].code_condition).code;
+        quad_add(&(yyval.code_statement).code,(yyvsp[-6].code_statement).code);
+        quad_add(&(yyval.code_statement).code,(yyvsp[-2].code_goto).code);
+        quad_add(&(yyval.code_statement).code,(yyvsp[-1].code_statement).code);
+        //$$.code=concatQuad(concatQuad(concatQuad($3.code,$7.code),$11.code),$12.code);
       }
-#line 1784 "y.tab.c" /* yacc.c:1646  */
+#line 2197 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 38:
-#line 362 "compilateur.y" /* yacc.c:1646  */
+  case 55:
+#line 649 "compilateur.y" /* yacc.c:1646  */
     { 
         complete((yyvsp[-5].code_condition).truelist,(yyvsp[-2].label));
         complete((yyvsp[-1].code_statement).nextlist,(yyvsp[-7].label));
         (yyval.code_statement).nextlist=(yyvsp[-5].code_condition).falselist;
-        (yyval.code_statement).code=concatQuad(concatQuad((yyvsp[-5].code_condition).code,(yyvsp[-1].code_statement).code),quad_gen(&nextquad,"goto",NULL,NULL,(yyvsp[-7].label)));
+        //$$.code=concatQuad(concatQuad($4.code,$8.code),quad_gen(&nextquad,"goto",NULL,NULL,$2));
+        (yyval.code_statement).code=(yyvsp[-5].code_condition).code;
+        quad_add(&(yyval.code_statement).code,(yyvsp[-1].code_statement).code);
+        quad_add(&(yyval.code_statement).code,quad_gen(&nextquad,"goto",NULL,NULL,(yyvsp[-7].label)));
         nextquad++;
       }
-#line 1796 "y.tab.c" /* yacc.c:1646  */
+#line 2212 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 39:
-#line 372 "compilateur.y" /* yacc.c:1646  */
+  case 56:
+#line 662 "compilateur.y" /* yacc.c:1646  */
     { 
         complete((yyvsp[-7].code_condition).truelist,(yyvsp[-2].label));
         complete((yyvsp[-1].code_statement).nextlist,(yyvsp[-8].label));
         (yyval.code_statement).nextlist=(yyvsp[-7].code_condition).falselist;
-        (yyval.code_statement).code=concatQuad(concatQuad((yyvsp[-7].code_condition).code,(yyvsp[-1].code_statement).code),quad_gen(&nextquad,"goto",NULL,NULL,(yyvsp[-8].label)));
+        //$$.code=concatQuad(concatQuad($6.code,$12.code),quad_gen(&nextquad,"goto",NULL,NULL,$5));
+        (yyval.code_statement).code=(yyvsp[-7].code_condition).code;
+        quad_add(&(yyval.code_statement).code,(yyvsp[-1].code_statement).code);
+        quad_add(&(yyval.code_statement).code,quad_gen(&nextquad,"goto",NULL,NULL,(yyvsp[-8].label)));
         nextquad++;
       }
-#line 1808 "y.tab.c" /* yacc.c:1646  */
+#line 2227 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 40:
-#line 382 "compilateur.y" /* yacc.c:1646  */
+  case 57:
+#line 675 "compilateur.y" /* yacc.c:1646  */
     { 
                                         symbol_print(tds);
                                         complete((yyvsp[-3].code_condition).falselist,(yyvsp[-1].label));
@@ -1822,11 +2241,11 @@ yyreduce:
                                         
                                         concatList((yyval.code_condition).truelist,(yyvsp[0].code_condition).truelist);
                                      }
-#line 1826 "y.tab.c" /* yacc.c:1646  */
+#line 2245 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 41:
-#line 395 "compilateur.y" /* yacc.c:1646  */
+  case 58:
+#line 688 "compilateur.y" /* yacc.c:1646  */
     {
                                         complete((yyvsp[-3].code_condition).truelist,(yyvsp[-1].label));
                                         (yyval.code_condition).code = (yyvsp[-3].code_condition).code;
@@ -1836,31 +2255,31 @@ yyreduce:
                                         concatList((yyval.code_condition).falselist,(yyvsp[0].code_condition).truelist);
                                         
                                      }
-#line 1840 "y.tab.c" /* yacc.c:1646  */
+#line 2259 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 42:
-#line 404 "compilateur.y" /* yacc.c:1646  */
+  case 59:
+#line 697 "compilateur.y" /* yacc.c:1646  */
     {
                                         (yyval.code_condition).code = (yyvsp[0].code_condition).code;
                                         (yyval.code_condition).truelist = (yyvsp[0].code_condition).falselist;
                                         (yyval.code_condition).falselist = (yyvsp[0].code_condition).truelist;
                                      }
-#line 1850 "y.tab.c" /* yacc.c:1646  */
+#line 2269 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 43:
-#line 409 "compilateur.y" /* yacc.c:1646  */
+  case 60:
+#line 702 "compilateur.y" /* yacc.c:1646  */
     {
                                         (yyval.code_condition).code = (yyvsp[-1].code_condition).code;
                                         (yyval.code_condition).truelist = (yyvsp[-1].code_condition).truelist;
                                         (yyval.code_condition).falselist = (yyvsp[-1].code_condition).falselist;
                                     }
-#line 1860 "y.tab.c" /* yacc.c:1646  */
+#line 2279 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 44:
-#line 414 "compilateur.y" /* yacc.c:1646  */
+  case 61:
+#line 707 "compilateur.y" /* yacc.c:1646  */
     {
                                       (yyval.code_condition).code = NULL;
                                       
@@ -1877,47 +2296,126 @@ yyreduce:
                                       (yyval.code_condition).truelist = newlist(goto_true);
                                       (yyval.code_condition).falselist = newlist(goto_false);
                                    }
-#line 1881 "y.tab.c" /* yacc.c:1646  */
+#line 2300 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 45:
-#line 432 "compilateur.y" /* yacc.c:1646  */
+  case 62:
+#line 725 "compilateur.y" /* yacc.c:1646  */
     { (yyval.string)=(yyvsp[0].string); }
-#line 1887 "y.tab.c" /* yacc.c:1646  */
+#line 2306 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 46:
-#line 433 "compilateur.y" /* yacc.c:1646  */
+  case 63:
+#line 726 "compilateur.y" /* yacc.c:1646  */
     { (yyval.string)=(yyvsp[0].string); }
-#line 1893 "y.tab.c" /* yacc.c:1646  */
+#line 2312 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 47:
-#line 434 "compilateur.y" /* yacc.c:1646  */
+  case 64:
+#line 727 "compilateur.y" /* yacc.c:1646  */
     { (yyval.string)=(yyvsp[0].string); }
-#line 1899 "y.tab.c" /* yacc.c:1646  */
+#line 2318 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 48:
-#line 435 "compilateur.y" /* yacc.c:1646  */
+  case 65:
+#line 728 "compilateur.y" /* yacc.c:1646  */
     { (yyval.string)=(yyvsp[0].string); }
-#line 1905 "y.tab.c" /* yacc.c:1646  */
+#line 2324 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 436 "compilateur.y" /* yacc.c:1646  */
+  case 66:
+#line 729 "compilateur.y" /* yacc.c:1646  */
     { (yyval.string)=(yyvsp[0].string); }
-#line 1911 "y.tab.c" /* yacc.c:1646  */
+#line 2330 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 437 "compilateur.y" /* yacc.c:1646  */
+  case 67:
+#line 730 "compilateur.y" /* yacc.c:1646  */
     { (yyval.string)=(yyvsp[0].string); }
-#line 1917 "y.tab.c" /* yacc.c:1646  */
+#line 2336 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 68:
+#line 739 "compilateur.y" /* yacc.c:1646  */
+    {
+                          (yyval.codegen).code=NULL;
+                          (yyval.codegen).result=(yyvsp[-1].codegen).result;
+                          (yyval.codegen).result=NULL;
+                        }
+#line 2346 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 69:
+#line 744 "compilateur.y" /* yacc.c:1646  */
+    {
+              (yyval.codegen).code=NULL;
+              (yyval.codegen).result=NULL;
+            }
+#line 2355 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 70:
+#line 751 "compilateur.y" /* yacc.c:1646  */
+    {
+                      (yyval.codegen).code=NULL;
+                      (yyval.codegen).result=(yyvsp[-1].codegen).result;
+                      (yyval.codegen).result=NULL;
+                    }
+#line 2365 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 71:
+#line 759 "compilateur.y" /* yacc.c:1646  */
+    {
+            (yyval.codegen).code=NULL;
+            (yyval.codegen).result=(yyvsp[0].codegen).result;
+            (yyval.codegen).result=NULL;
+          }
+#line 2375 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 72:
+#line 764 "compilateur.y" /* yacc.c:1646  */
+    {
+                        (yyval.codegen).code=NULL;
+                        (yyval.codegen).result=(yyvsp[-2].codegen).result;
+                        struct symbol* temp=(yyvsp[-2].codegen).result;
+                        while(temp->next!=NULL)
+                        {
+                          temp->next=(yyvsp[0].codegen).result;
+                        }
+                        (yyval.codegen).result=NULL;
+                      }
+#line 2390 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 73:
+#line 777 "compilateur.y" /* yacc.c:1646  */
+    {
+                          (yyval.codegen).code=NULL;
+                          (yyval.codegen).result = symbol_newtemp(&tds);
+                          (yyval.codegen).result->type = (yyvsp[-2].num).type;
+                          (yyval.codegen).result->value = (yyvsp[-2].num).value;
+                          (yyval.codegen).result->next=(yyvsp[0].codegen).result;
+                          (yyval.codegen).result=NULL;
+                        }
+#line 2403 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 74:
+#line 785 "compilateur.y" /* yacc.c:1646  */
+    {
+            (yyval.codegen).code=NULL;
+            (yyval.codegen).result = symbol_newtemp(&tds);
+            (yyval.codegen).result->type = (yyvsp[0].num).type;
+            (yyval.codegen).result->value = (yyvsp[0].num).value;
+            //$$.result=NULL;
+          }
+#line 2415 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1921 "y.tab.c" /* yacc.c:1646  */
+#line 2419 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2145,7 +2643,17 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 464 "compilateur.y" /* yacc.c:1906  */
+#line 793 "compilateur.y" /* yacc.c:1906  */
+
+
+void errorManagement(char * str)
+{
+  fputs(str, stderr);
+  //fprintf(stderr, str);
+  symbol_free(tds);
+  quad_free(code);
+  exit(-1);
+}
 
 int main(int argc, char *argv[]) {
   if (argc > 1) {
@@ -2155,6 +2663,7 @@ int main(int argc, char *argv[]) {
   if (argc > 1) {
       fclose(yyin);
   }
+  convert(code,tds);
   // symbol_print(tds);
   symbol_free(tds);
   quad_free(code);
